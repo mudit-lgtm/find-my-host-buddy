@@ -19,6 +19,9 @@ const externalLinks = [
   { label: "Cloudflare — What is DNS?", href: "https://www.cloudflare.com/learning/dns/what-is-dns/", rel: "noopener noreferrer" },
   { label: "W3Techs — Hosting Stats", href: "https://w3techs.com/technologies/overview/web_hosting", rel: "noopener noreferrer" },
   { label: "Google PageSpeed", href: "https://developers.google.com/speed/docs/insights/v5/about", rel: "noopener noreferrer" },
+  { label: "Let's Encrypt — Free SSL", href: "https://letsencrypt.org/", rel: "noopener noreferrer" },
+  { label: "SSL Labs — SSL Test", href: "https://www.ssllabs.com/ssltest/", rel: "noopener noreferrer" },
+  { label: "Google Web Vitals", href: "https://web.dev/articles/vitals", rel: "noopener noreferrer" },
 ];
 
 export function Footer() {

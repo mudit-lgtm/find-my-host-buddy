@@ -56,6 +56,31 @@ const faqs = [
     answer:
       "Yes, our tool works with any publicly accessible domain worldwide. Simply enter the domain name and we'll identify the hosting provider regardless of the country or region the website is hosted in.",
   },
+  {
+    question: "How do I check if a website uses Cloudflare?",
+    answer:
+      "Enter the domain into our hosting checker. If the site uses Cloudflare, the nameservers will typically end in .ns.cloudflare.com and the IP address will belong to Cloudflare's network range. Our tool flags Cloudflare-proxied sites so you can see at a glance whether a CDN is in front of the origin server.",
+  },
+  {
+    question: "What are nameservers and why do they matter?",
+    answer:
+      "Nameservers are specialized DNS servers that store DNS records for a domain and respond to queries about where the domain's website and email are hosted. They're usually provided by your hosting company or DNS provider (e.g., ns1.example-host.com). Nameservers matter because they control how traffic reaches your site — incorrect nameserver settings can take your website offline.",
+  },
+  {
+    question: "How do I find the IP address of a website?",
+    answer:
+      "Use our hosting checker tool — simply enter the domain and we'll display the IPv4 (A record) and IPv6 (AAAA record) addresses. You can also use command-line tools like nslookup, dig, or ping, but our tool provides additional context like geolocation and hosting provider identification.",
+  },
+  {
+    question: "Can I find out what CMS a website is using?",
+    answer:
+      "Our hosting checker focuses on infrastructure — hosting provider, IP, DNS, and server location. While we don't directly detect CMS platforms like WordPress or Shopify, certain hosting providers (e.g., WP Engine, Shopify Inc.) strongly indicate the CMS in use. For dedicated CMS detection, tools like BuiltWith or Wappalyzer are recommended.",
+  },
+  {
+    question: "What is reverse DNS lookup?",
+    answer:
+      "Reverse DNS (rDNS) lookup resolves an IP address back to a hostname, the opposite of a standard DNS query. It's used to verify server identity, troubleshoot email deliverability, and investigate suspicious traffic. Our tool shows the IP address for any domain, which you can then use with reverse DNS services to find the associated hostname.",
+  },
 ];
 
 export function FAQSection() {
