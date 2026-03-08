@@ -6,7 +6,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Known hosting providers matched by NS records, org, ISP
 const HOSTING_PROVIDERS: Record<string, string[]> = {
   "Amazon Web Services (AWS)": ["awsdns", "amazonaws", "aws", "ec2", "cloudfront"],
   "Google Cloud": ["googledomains", "google.com", "googleusercontent", "ghs.google"],
@@ -69,27 +68,232 @@ async function resolveDNS(domain: string, type: string): Promise<string[]> {
   }
 }
 
-async function checkSiteStatus(domain: string): Promise<{ isUp: boolean; statusCode: number; responseTime: number }> {
+// Email provider detection from MX records
+function identifyEmailProvider(mxRecords: string[]): string {
+  const mx = mxRecords.join(" ").toLowerCase();
+  if (mx.includes("google") || mx.includes("googlemail")) return "Google Workspace";
+  if (mx.includes("outlook") || mx.includes("protection.outlook") || mx.includes("microsoft")) return "Microsoft 365";
+  if (mx.includes("zoho")) return "Zoho Mail";
+  if (mx.includes("protonmail") || mx.includes("proton")) return "ProtonMail";
+  if (mx.includes("mimecast")) return "Mimecast";
+  if (mx.includes("barracuda")) return "Barracuda";
+  if (mx.includes("pphosted") || mx.includes("proofpoint")) return "Proofpoint";
+  if (mx.includes("secureserver") || mx.includes("godaddy")) return "GoDaddy Email";
+  if (mx.includes("hostinger")) return "Hostinger Email";
+  if (mx.includes("ovh")) return "OVH Email";
+  if (mx.includes("yahoo")) return "Yahoo Mail";
+  if (mx.includes("icloud") || mx.includes("apple")) return "iCloud Mail";
+  if (mxRecords.length > 0) return "Custom/Self-hosted";
+  return "No email configured";
+}
+
+// Technology detection from headers + HTML body
+interface TechResult {
+  cms: string[];
+  frameworks: string[];
+  cdn: string[];
+  analytics: string[];
+  server: string[];
+  javascript: string[];
+}
+
+function detectTechnologies(headers: Record<string, string>, body: string): TechResult {
+  const tech: TechResult = { cms: [], frameworks: [], cdn: [], analytics: [], server: [], javascript: [] };
+  const h = Object.fromEntries(Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v.toLowerCase()]));
+  const b = body.toLowerCase();
+
+  // Server
+  if (h["server"]) {
+    const s = h["server"];
+    if (s.includes("nginx")) tech.server.push("Nginx");
+    else if (s.includes("apache")) tech.server.push("Apache");
+    else if (s.includes("litespeed")) tech.server.push("LiteSpeed");
+    else if (s.includes("cloudflare")) tech.server.push("Cloudflare");
+    else if (s.includes("microsoft") || s.includes("iis")) tech.server.push("Microsoft IIS");
+    else tech.server.push(h["server"]);
+  }
+  if (h["x-powered-by"]) {
+    const xp = h["x-powered-by"];
+    if (xp.includes("php")) tech.server.push("PHP");
+    if (xp.includes("express")) tech.server.push("Express.js");
+    if (xp.includes("asp.net")) tech.server.push("ASP.NET");
+    if (xp.includes("next.js")) tech.frameworks.push("Next.js");
+  }
+
+  // CMS
+  if (b.includes("wp-content") || b.includes("wp-includes") || b.includes("wordpress")) tech.cms.push("WordPress");
+  if (b.includes("cdn.shopify") || b.includes("shopify.com") || b.includes("myshopify")) tech.cms.push("Shopify");
+  if (b.includes("squarespace")) tech.cms.push("Squarespace");
+  if (b.includes("wix.com") || b.includes("wixstatic")) tech.cms.push("Wix");
+  if (b.includes("webflow")) tech.cms.push("Webflow");
+  if (b.includes("drupal")) tech.cms.push("Drupal");
+  if (b.includes("joomla")) tech.cms.push("Joomla");
+  if (b.includes("ghost.io") || b.includes("ghost-")) tech.cms.push("Ghost");
+  if (b.includes('content="hugo"') || b.includes("gohugo")) tech.cms.push("Hugo");
+  if (b.includes("contentful")) tech.cms.push("Contentful");
+
+  // Frameworks
+  if (b.includes("__next_data__") || b.includes("/_next/")) tech.frameworks.push("Next.js");
+  if (b.includes("__nuxt") || b.includes("/_nuxt/")) tech.frameworks.push("Nuxt.js");
+  if ((b.includes("react") && b.includes("reactdom")) || b.includes("_reactroot") || b.includes("__react")) tech.frameworks.push("React");
+  if (b.includes("ng-version") || b.includes("ng-app") || b.includes("angular")) tech.frameworks.push("Angular");
+  if (b.includes("__svelte") || b.includes("svelte")) tech.frameworks.push("Svelte");
+  if (b.includes("gatsby")) tech.frameworks.push("Gatsby");
+  if (b.includes("vue") && (b.includes("__vue") || b.includes("vue.js") || b.includes("vue@"))) tech.frameworks.push("Vue.js");
+  if (b.includes("remix") && b.includes("__remix")) tech.frameworks.push("Remix");
+  if (b.includes("astro")) tech.frameworks.push("Astro");
+
+  // CDN
+  if (h["cf-ray"] || h["cf-cache-status"]) tech.cdn.push("Cloudflare");
+  if (h["x-amz-cf-id"] || h["x-amz-cf-pop"]) tech.cdn.push("AWS CloudFront");
+  if (h["x-fastly-request-id"] || h["via"]?.includes("fastly")) tech.cdn.push("Fastly");
+  if (h["x-served-by"]?.includes("cache")) tech.cdn.push("Varnish Cache");
+  if (h["x-cdn"]?.includes("akamai") || h["x-akamai-transformed"]) tech.cdn.push("Akamai");
+  if (b.includes("cdn.jsdelivr")) tech.cdn.push("jsDelivr");
+  if (b.includes("cdnjs.cloudflare")) tech.cdn.push("cdnjs");
+  if (b.includes("unpkg.com")) tech.cdn.push("unpkg");
+
+  // Analytics
+  if (b.includes("gtag") || b.includes("google-analytics") || b.includes("ga.js") || b.includes("analytics.js") || b.includes("googletagmanager")) tech.analytics.push("Google Analytics");
+  if (b.includes("fbq(") || b.includes("facebook.net/en_US/fbevents") || b.includes("connect.facebook.net")) tech.analytics.push("Facebook Pixel");
+  if (b.includes("hotjar")) tech.analytics.push("Hotjar");
+  if (b.includes("segment.com") || b.includes("segment.io") || b.includes("analytics.min.js")) tech.analytics.push("Segment");
+  if (b.includes("mixpanel")) tech.analytics.push("Mixpanel");
+  if (b.includes("clarity.ms")) tech.analytics.push("Microsoft Clarity");
+  if (b.includes("plausible")) tech.analytics.push("Plausible");
+  if (b.includes("matomo") || b.includes("piwik")) tech.analytics.push("Matomo");
+  if (b.includes("amplitude")) tech.analytics.push("Amplitude");
+
+  // JS Libraries
+  if (b.includes("jquery") && !b.includes("jqueryui")) tech.javascript.push("jQuery");
+  if (b.includes("bootstrap")) tech.javascript.push("Bootstrap");
+  if (b.includes("tailwindcss") || b.includes("tailwind")) tech.javascript.push("Tailwind CSS");
+  if (b.includes("lodash")) tech.javascript.push("Lodash");
+  if (b.includes("gsap") || b.includes("greensock")) tech.javascript.push("GSAP");
+  if (b.includes("three.js") || b.includes("threejs")) tech.javascript.push("Three.js");
+
+  // Deduplicate
+  tech.frameworks = [...new Set(tech.frameworks)];
+  tech.cms = [...new Set(tech.cms)];
+  tech.cdn = [...new Set(tech.cdn)];
+
+  return tech;
+}
+
+// Security headers analysis
+interface SecurityHeadersResult {
+  hsts: boolean;
+  xFrameOptions: boolean;
+  csp: boolean;
+  xContentType: boolean;
+  referrerPolicy: boolean;
+  permissionsPolicy: boolean;
+}
+
+function analyzeSecurityHeaders(headers: Record<string, string>): { headers: SecurityHeadersResult; grade: string } {
+  const h = Object.fromEntries(Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v]));
+
+  const result: SecurityHeadersResult = {
+    hsts: !!h["strict-transport-security"],
+    xFrameOptions: !!h["x-frame-options"],
+    csp: !!h["content-security-policy"],
+    xContentType: !!h["x-content-type-options"],
+    referrerPolicy: !!h["referrer-policy"],
+    permissionsPolicy: !!h["permissions-policy"],
+  };
+
+  const count = Object.values(result).filter(Boolean).length;
+  let grade: string;
+  if (count >= 6) grade = "A+";
+  else if (count >= 5) grade = "A";
+  else if (count >= 4) grade = "B";
+  else if (count >= 3) grade = "C";
+  else if (count >= 2) grade = "D";
+  else grade = "F";
+
+  return { headers: result, grade };
+}
+
+// Performance grading
+function gradePerformance(ttfb: number): string {
+  if (ttfb < 200) return "Excellent";
+  if (ttfb < 500) return "Good";
+  if (ttfb < 1000) return "Average";
+  return "Slow";
+}
+
+// Full site fetch — GET request to collect headers + body
+async function fetchSiteData(domain: string): Promise<{
+  isUp: boolean;
+  statusCode: number;
+  responseTime: number;
+  headers: Record<string, string>;
+  body: string;
+  contentLength: number;
+  ssl: { issuer: string; protocol: string; validFrom: string; validTo: string };
+}> {
   const start = Date.now();
-  try {
-    const resp = await fetch(`https://${domain}`, {
-      method: "HEAD",
-      redirect: "follow",
-      signal: AbortSignal.timeout(10000),
-    });
-    return { isUp: resp.ok || resp.status < 500, statusCode: resp.status, responseTime: Date.now() - start };
-  } catch {
+  const defaultResult = {
+    isUp: false, statusCode: 0, responseTime: 0,
+    headers: {}, body: "", contentLength: 0,
+    ssl: { issuer: "", protocol: "", validFrom: "", validTo: "" },
+  };
+
+  for (const protocol of ["https", "http"]) {
     try {
-      const resp = await fetch(`http://${domain}`, {
-        method: "HEAD",
+      const resp = await fetch(`${protocol}://${domain}`, {
+        method: "GET",
         redirect: "follow",
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(12000),
+        headers: { "User-Agent": "HostingCheckerBot/1.0" },
       });
-      return { isUp: resp.ok || resp.status < 500, statusCode: resp.status, responseTime: Date.now() - start };
+      const responseTime = Date.now() - start;
+      const body = await resp.text();
+      const headerObj: Record<string, string> = {};
+      resp.headers.forEach((v, k) => { headerObj[k] = v; });
+
+      const contentLength = parseInt(headerObj["content-length"] || "0") || body.length;
+
+      // SSL info — we can't directly inspect TLS certs from Deno fetch,
+      // but we can infer from the protocol used and check headers
+      const ssl = {
+        issuer: protocol === "https" ? "Valid SSL" : "No SSL",
+        protocol: protocol === "https" ? "TLS" : "None",
+        validFrom: "",
+        validTo: "",
+      };
+
+      return {
+        isUp: resp.ok || resp.status < 500,
+        statusCode: resp.status,
+        responseTime,
+        headers: headerObj,
+        body: body.substring(0, 100000), // limit to ~100KB
+        contentLength,
+        ssl,
+      };
     } catch {
-      return { isUp: false, statusCode: 0, responseTime: 0 };
+      continue;
     }
   }
+  return defaultResult;
+}
+
+// Favicon extraction
+function extractFavicon(domain: string, body: string): string {
+  // Try to find favicon in HTML
+  const iconMatch = body.match(/<link[^>]*rel=["'](?:shortcut )?icon["'][^>]*href=["']([^"']+)["']/i)
+    || body.match(/<link[^>]*href=["']([^"']+)["'][^>]*rel=["'](?:shortcut )?icon["']/i);
+
+  if (iconMatch && iconMatch[1]) {
+    const href = iconMatch[1];
+    if (href.startsWith("http")) return href;
+    if (href.startsWith("//")) return `https:${href}`;
+    return `https://${domain}${href.startsWith("/") ? "" : "/"}${href}`;
+  }
+
+  // Fallback to Google's favicon service
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
 }
 
 serve(async (req) => {
@@ -106,18 +310,17 @@ serve(async (req) => {
       });
     }
 
-    // Clean domain
     const cleanDomain = domain.replace(/^(https?:\/\/)?(www\.)?/, "").split("/")[0].split("?")[0];
 
     // Run all lookups in parallel
-    const [aRecords, nsRecords, mxRecords, siteStatus] = await Promise.all([
+    const [aRecords, nsRecords, mxRecords, siteData] = await Promise.all([
       resolveDNS(cleanDomain, "A"),
       resolveDNS(cleanDomain, "NS"),
       resolveDNS(cleanDomain, "MX"),
-      checkSiteStatus(cleanDomain),
+      fetchSiteData(cleanDomain),
     ]);
 
-    // Get IP geolocation
+    // IP geolocation
     const ipAddress = aRecords[0] || "";
     let serverLocation = { country: "Unknown", city: "Unknown", lat: 0, lon: 0, isp: "", org: "" };
 
@@ -133,12 +336,15 @@ serve(async (req) => {
           isp: geo.isp || "",
           org: geo.org || "",
         };
-      } catch {
-        // keep defaults
-      }
+      } catch { /* keep defaults */ }
     }
 
     const hostingProvider = identifyProvider(nsRecords, serverLocation.org, serverLocation.isp);
+    const technologies = detectTechnologies(siteData.headers, siteData.body);
+    const security = analyzeSecurityHeaders(siteData.headers);
+    const emailProvider = identifyEmailProvider(mxRecords);
+    const favicon = extractFavicon(cleanDomain, siteData.body);
+    const performanceGrade = gradePerformance(siteData.responseTime);
 
     const result = {
       domain: cleanDomain,
@@ -146,7 +352,23 @@ serve(async (req) => {
       hostingProvider,
       serverLocation,
       dns: { a: aRecords, ns: nsRecords, mx: mxRecords },
-      siteStatus,
+      siteStatus: {
+        isUp: siteData.isUp,
+        statusCode: siteData.statusCode,
+        responseTime: siteData.responseTime,
+      },
+      ssl: siteData.ssl,
+      securityHeaders: security.headers,
+      securityGrade: security.grade,
+      technologies,
+      performance: {
+        ttfb: siteData.responseTime,
+        contentLength: siteData.contentLength,
+        grade: performanceGrade,
+      },
+      favicon,
+      emailProvider,
+      screenshot: `https://image.thum.io/get/width/600/crop/400/https://${cleanDomain}`,
     };
 
     return new Response(JSON.stringify(result), {

@@ -20,4 +20,35 @@ export interface HostingResult {
     statusCode: number;
     responseTime: number;
   };
+  ssl: {
+    issuer: string;
+    protocol: string;
+    validFrom: string;
+    validTo: string;
+  };
+  securityHeaders: {
+    hsts: boolean;
+    xFrameOptions: boolean;
+    csp: boolean;
+    xContentType: boolean;
+    referrerPolicy: boolean;
+    permissionsPolicy: boolean;
+  };
+  securityGrade: string;
+  technologies: {
+    cms: string[];
+    frameworks: string[];
+    cdn: string[];
+    analytics: string[];
+    server: string[];
+    javascript: string[];
+  };
+  performance: {
+    ttfb: number;
+    contentLength: number;
+    grade: string;
+  };
+  favicon: string;
+  emailProvider: string;
+  screenshot: string;
 }
