@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Globe, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,11 +7,11 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { NavLink } from "@/components/NavLink";
 import { useState } from "react";
 
 const navLinks = [
   { label: "Hosting Checker", href: "/#hosting-checker" },
+  { label: "How It Works", href: "/#how-it-works" },
   { label: "How It Works", href: "/#how-it-works" },
   { label: "Tools", href: "/#tools" },
   { label: "FAQ", href: "/#faq" },
@@ -35,9 +35,13 @@ export function Header() {
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => (
-            <NavLink key={link.href} href={link.href}>
+            <a
+              key={link.href}
+              href={link.href}
+              className="px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            >
               {link.label}
-            </NavLink>
+            </a>
           ))}
         </nav>
 
