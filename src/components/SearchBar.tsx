@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,11 +18,9 @@ export function SearchBar({ defaultValue = "" }: { defaultValue?: string }) {
   const [query, setQuery] = useState(defaultValue);
   const navigate = useNavigate();
 
-  // Sync when defaultValue changes (e.g. quick-check navigation)
-  useState(() => {
+  useEffect(() => {
     setQuery(defaultValue);
-  });
-  const navigate = useNavigate();
+  }, [defaultValue]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
