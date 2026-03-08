@@ -18,6 +18,12 @@ export function SearchBar({ defaultValue = "" }: { defaultValue?: string }) {
   const [query, setQuery] = useState(defaultValue);
   const navigate = useNavigate();
 
+  // Sync when defaultValue changes (e.g. quick-check navigation)
+  useState(() => {
+    setQuery(defaultValue);
+  });
+  const navigate = useNavigate();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const domain = extractDomain(query);
