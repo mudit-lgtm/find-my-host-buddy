@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FAQSection } from "@/components/FAQSection";
 import { HowToSection } from "@/components/HowToSection";
+import { TrustFactors } from "@/components/TrustFactors";
 import { SEOContent } from "@/components/SEOContent";
 import { SchemaMarkup } from "@/components/SchemaMarkup";
 import { Server, Globe, Wifi, Search, Shield, Activity } from "lucide-react";
@@ -42,6 +43,9 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        {/* Trust Factors */}
+        <TrustFactors />
 
         {/* How It Works */}
         <HowToSection />

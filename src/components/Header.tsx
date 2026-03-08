@@ -12,6 +12,7 @@ import { useState } from "react";
 const navLinks = [
   { label: "Hosting Checker", href: "/#hosting-checker" },
   { label: "How It Works", href: "/#how-it-works" },
+  { label: "Trust", href: "/#why-trust-us" },
   { label: "Tools", href: "/#tools" },
   { label: "FAQ", href: "/#faq" },
   { label: "Guide", href: "/#hosting-guide" },
