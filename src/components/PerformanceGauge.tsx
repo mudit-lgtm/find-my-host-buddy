@@ -20,15 +20,14 @@ function formatBytes(bytes: number): string {
 
 export function PerformanceGauge({ ttfb, grade, contentLength }: PerformanceGaugeProps) {
   const config = gradeConfig[grade] || gradeConfig.Slow;
-  // Map TTFB to a 0-100 score (lower is better) for the circular gauge
   const score = Math.max(0, Math.min(100, Math.round(100 - (ttfb / 20))));
   const circumference = 2 * Math.PI * 40;
   const dashOffset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="flex items-center gap-5">
-      {/* Circular gauge */}
-      <div className="relative h-24 w-24 shrink-0">
+    <div className="flex items-center gap-4 sm:gap-5">
+      {/* Circular gauge - responsive */}
+      <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0">
         <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
           <circle cx="50" cy="50" r="40" fill="none" strokeWidth="8" className="stroke-muted" />
           <circle
@@ -39,12 +38,12 @@ export function PerformanceGauge({ ttfb, grade, contentLength }: PerformanceGaug
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-lg font-display font-black ${config.color}`}>{score}</span>
-          <span className="text-[10px] text-muted-foreground">/ 100</span>
+          <span className={`text-base sm:text-lg font-display font-black ${config.color}`}>{score}</span>
+          <span className="text-[9px] sm:text-[10px] text-muted-foreground">/ 100</span>
         </div>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-1 sm:space-y-1.5">
         <div>
           <span className={`text-sm font-semibold ${config.color}`}>{grade}</span>
         </div>

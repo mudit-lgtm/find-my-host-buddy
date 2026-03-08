@@ -41,12 +41,12 @@ export function ShareResults({ data }: ShareResultsProps) {
   };
 
   return (
-    <div className="flex gap-2">
-      <Button variant="outline" size="sm" onClick={copyLink} className="gap-1.5">
+    <div className="flex gap-2 w-full sm:w-auto">
+      <Button variant="outline" size="sm" onClick={copyLink} className="gap-1.5 flex-1 sm:flex-initial text-xs sm:text-sm">
         {copied === "link" ? <Check className="h-3.5 w-3.5" /> : <Share2 className="h-3.5 w-3.5" />}
-        Share Link
+        Share
       </Button>
-      <Button variant="outline" size="sm" onClick={copyText} className="gap-1.5">
+      <Button variant="outline" size="sm" onClick={copyText} className="gap-1.5 flex-1 sm:flex-initial text-xs sm:text-sm">
         {copied === "text" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
         Copy Report
       </Button>

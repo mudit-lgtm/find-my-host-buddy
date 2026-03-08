@@ -1,5 +1,5 @@
-import { Shield, Check, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { Check, X, ChevronDown, ChevronUp } from "lucide-react";
 
 interface SecurityGradeGaugeProps {
   grade: string;
@@ -33,23 +33,36 @@ const headerLabels: Record<string, string> = {
 };
 
 export function SecurityGradeGauge({ grade, headers, ssl }: SecurityGradeGaugeProps) {
+  const [expanded, setExpanded] = useState(false);
   const colorClass = gradeColors[grade] || gradeColors.F;
+  const passCount = Object.values(headers).filter(Boolean).length;
+  const total = Object.values(headers).length;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-4">
-        <div className={`flex h-16 w-16 items-center justify-center rounded-2xl border-2 ${colorClass}`}>
-          <span className="text-2xl font-display font-black">{grade}</span>
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex items-center gap-3 sm:gap-4">
+        <div className={`flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl border-2 ${colorClass}`}>
+          <span className="text-xl sm:text-2xl font-display font-black">{grade}</span>
         </div>
         <div>
           <p className="text-sm font-medium text-foreground">Security Grade</p>
           <p className="text-xs text-muted-foreground">
             {ssl.protocol !== "None" ? `${ssl.protocol} Secured` : "No SSL detected"}
           </p>
+          <p className="text-xs text-muted-foreground">{passCount}/{total} headers present</p>
         </div>
       </div>
 
-      <div className="space-y-1.5">
+      {/* Collapsible on mobile */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-1 text-xs text-primary font-medium sm:hidden"
+      >
+        {expanded ? "Hide" : "Show"} details
+        {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+      </button>
+
+      <div className={`space-y-1.5 ${expanded ? "block" : "hidden"} sm:block`}>
         {Object.entries(headers).map(([key, present]) => (
           <div key={key} className="flex items-center gap-2 text-xs">
             {present ? (
