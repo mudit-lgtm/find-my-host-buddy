@@ -33,7 +33,7 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-2 font-display font-bold text-foreground mb-3">
               <Globe className="h-4 w-4 text-primary" />
-              HostingChecker
+              Site Host Finder
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Free hosting lookup tool. Find out who hosts any website instantly.
@@ -84,7 +84,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} HostingChecker. All rights reserved. Free website hosting checker tool.</p>
+          <p>© {new Date().getFullYear()} Site Host Finder. All rights reserved. Free website hosting checker tool.</p>
         </div>
       </div>
     </footer>
