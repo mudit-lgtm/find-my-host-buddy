@@ -29,7 +29,7 @@ export function Header() {
           className="flex items-center gap-2 font-display font-bold text-lg text-foreground"
         >
           <Globe className="h-5 w-5 text-primary" />
-          HostingChecker
+          Site Host Finder
         </Link>
 
         {/* Desktop Nav */}

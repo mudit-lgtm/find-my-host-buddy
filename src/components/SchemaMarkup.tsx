@@ -5,8 +5,8 @@ export function SchemaMarkup() {
   const webAppSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "HostingChecker",
-    url: "https://hostingchecker.org",
+    name: "Site Host Finder",
+    url: "https://site-host-finder.vercel.app",
     description:
       "Free hosting checker tool to find out who hosts any website. Instantly discover the hosting provider, IP address, server location, and DNS records for any domain.",
     applicationCategory: "WebApplication",
@@ -32,8 +32,8 @@ export function SchemaMarkup() {
   const softwareAppSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "HostingChecker",
-    url: "https://hostingchecker.org",
+    name: "Site Host Finder",
+    url: "https://site-host-finder.vercel.app",
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Web",
     offers: {
@@ -53,9 +53,9 @@ export function SchemaMarkup() {
   const orgSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "HostingChecker",
-    url: "https://hostingchecker.org",
-    logo: "https://hostingchecker.org/favicon.ico",
+    name: "Site Host Finder",
+    url: "https://site-host-finder.vercel.app",
+    logo: "https://site-host-finder.vercel.app/favicon.ico",
     description:
       "Free web hosting lookup tools for developers, SEO professionals, and website owners.",
   };
@@ -91,12 +91,12 @@ export function SchemaMarkup() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://hostingchecker.org/" },
-      { "@type": "ListItem", position: 2, name: "Hosting Checker", item: "https://hostingchecker.org/#hosting-checker" },
-      { "@type": "ListItem", position: 3, name: "How It Works", item: "https://hostingchecker.org/#how-it-works" },
-      { "@type": "ListItem", position: 4, name: "Tools", item: "https://hostingchecker.org/#tools" },
-      { "@type": "ListItem", position: 5, name: "FAQ", item: "https://hostingchecker.org/#faq" },
-      { "@type": "ListItem", position: 6, name: "Hosting Guide", item: "https://hostingchecker.org/#hosting-guide" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://site-host-finder.vercel.app/" },
+      { "@type": "ListItem", position: 2, name: "Hosting Checker", item: "https://site-host-finder.vercel.app/#hosting-checker" },
+      { "@type": "ListItem", position: 3, name: "How It Works", item: "https://site-host-finder.vercel.app/#how-it-works" },
+      { "@type": "ListItem", position: 4, name: "Tools", item: "https://site-host-finder.vercel.app/#tools" },
+      { "@type": "ListItem", position: 5, name: "FAQ", item: "https://site-host-finder.vercel.app/#faq" },
+      { "@type": "ListItem", position: 6, name: "Hosting Guide", item: "https://site-host-finder.vercel.app/#hosting-guide" },
     ],
   };
 
