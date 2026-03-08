@@ -1,1 +1,4 @@
 project_id = "eaohdyrikbezycnftull"
+
+[functions.hosting-lookup]
+verify_jwt = false
