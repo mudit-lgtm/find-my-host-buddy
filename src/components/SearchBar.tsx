@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,10 @@ const quickDomains = ["google.com", "shopify.com", "github.com", "wordpress.com"
 export function SearchBar({ defaultValue = "" }: { defaultValue?: string }) {
   const [query, setQuery] = useState(defaultValue);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setQuery(defaultValue);
+  }, [defaultValue]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
