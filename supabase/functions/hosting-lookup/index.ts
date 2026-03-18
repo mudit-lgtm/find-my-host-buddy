@@ -68,7 +68,66 @@ async function resolveDNS(domain: string, type: string): Promise<string[]> {
   }
 }
 
-// Email provider detection from MX records
+// WHOIS lookup via RDAP
+async function fetchWhois(domain: string): Promise<{
+  registrar: string;
+  createdDate: string;
+  expiryDate: string;
+  updatedDate: string;
+  domainAge: string;
+  registrant: string;
+}> {
+  const defaults = { registrar: "Unknown", createdDate: "", expiryDate: "", updatedDate: "", domainAge: "", registrant: "" };
+  try {
+    const resp = await fetch(`https://rdap.org/domain/${domain}`, {
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!resp.ok) { await resp.text(); return defaults; }
+    const data = await resp.json();
+
+    let registrar = "Unknown";
+    if (data.entities) {
+      for (const entity of data.entities) {
+        if (entity.roles?.includes("registrar")) {
+          registrar = entity.vcardArray?.[1]?.find((v: string[]) => v[0] === "fn")?.[3]
+            || entity.handle || "Unknown";
+        }
+      }
+    }
+
+    let createdDate = "", expiryDate = "", updatedDate = "";
+    if (data.events) {
+      for (const evt of data.events) {
+        if (evt.eventAction === "registration") createdDate = evt.eventDate || "";
+        if (evt.eventAction === "expiration") expiryDate = evt.eventDate || "";
+        if (evt.eventAction === "last changed") updatedDate = evt.eventDate || "";
+      }
+    }
+
+    let domainAge = "";
+    if (createdDate) {
+      const created = new Date(createdDate);
+      const now = new Date();
+      const years = Math.floor((now.getTime() - created.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      const months = Math.floor(((now.getTime() - created.getTime()) % (365.25 * 24 * 60 * 60 * 1000)) / (30.44 * 24 * 60 * 60 * 1000));
+      domainAge = years > 0 ? `${years} years, ${months} months` : `${months} months`;
+    }
+
+    let registrant = "";
+    if (data.entities) {
+      for (const entity of data.entities) {
+        if (entity.roles?.includes("registrant")) {
+          registrant = entity.vcardArray?.[1]?.find((v: string[]) => v[0] === "fn")?.[3] || "";
+        }
+      }
+    }
+
+    return { registrar, createdDate, expiryDate, updatedDate, domainAge, registrant };
+  } catch {
+    return defaults;
+  }
+}
+
 function identifyEmailProvider(mxRecords: string[]): string {
   const mx = mxRecords.join(" ").toLowerCase();
   if (mx.includes("google") || mx.includes("googlemail")) return "Google Workspace";
@@ -87,7 +146,6 @@ function identifyEmailProvider(mxRecords: string[]): string {
   return "No email configured";
 }
 
-// Technology detection from headers + HTML body
 interface TechResult {
   cms: string[];
   frameworks: string[];
@@ -102,7 +160,6 @@ function detectTechnologies(headers: Record<string, string>, body: string): Tech
   const h = Object.fromEntries(Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v.toLowerCase()]));
   const b = body.toLowerCase();
 
-  // Server
   if (h["server"]) {
     const s = h["server"];
     if (s.includes("nginx")) tech.server.push("Nginx");
@@ -120,7 +177,6 @@ function detectTechnologies(headers: Record<string, string>, body: string): Tech
     if (xp.includes("next.js")) tech.frameworks.push("Next.js");
   }
 
-  // CMS
   if (b.includes("wp-content") || b.includes("wp-includes") || b.includes("wordpress")) tech.cms.push("WordPress");
   if (b.includes("cdn.shopify") || b.includes("shopify.com") || b.includes("myshopify")) tech.cms.push("Shopify");
   if (b.includes("squarespace")) tech.cms.push("Squarespace");
@@ -132,7 +188,6 @@ function detectTechnologies(headers: Record<string, string>, body: string): Tech
   if (b.includes('content="hugo"') || b.includes("gohugo")) tech.cms.push("Hugo");
   if (b.includes("contentful")) tech.cms.push("Contentful");
 
-  // Frameworks
   if (b.includes("__next_data__") || b.includes("/_next/")) tech.frameworks.push("Next.js");
   if (b.includes("__nuxt") || b.includes("/_nuxt/")) tech.frameworks.push("Nuxt.js");
   if ((b.includes("react") && b.includes("reactdom")) || b.includes("_reactroot") || b.includes("__react")) tech.frameworks.push("React");
@@ -143,7 +198,6 @@ function detectTechnologies(headers: Record<string, string>, body: string): Tech
   if (b.includes("remix") && b.includes("__remix")) tech.frameworks.push("Remix");
   if (b.includes("astro")) tech.frameworks.push("Astro");
 
-  // CDN
   if (h["cf-ray"] || h["cf-cache-status"]) tech.cdn.push("Cloudflare");
   if (h["x-amz-cf-id"] || h["x-amz-cf-pop"]) tech.cdn.push("AWS CloudFront");
   if (h["x-fastly-request-id"] || h["via"]?.includes("fastly")) tech.cdn.push("Fastly");
@@ -153,7 +207,6 @@ function detectTechnologies(headers: Record<string, string>, body: string): Tech
   if (b.includes("cdnjs.cloudflare")) tech.cdn.push("cdnjs");
   if (b.includes("unpkg.com")) tech.cdn.push("unpkg");
 
-  // Analytics
   if (b.includes("gtag") || b.includes("google-analytics") || b.includes("ga.js") || b.includes("analytics.js") || b.includes("googletagmanager")) tech.analytics.push("Google Analytics");
   if (b.includes("fbq(") || b.includes("facebook.net/en_US/fbevents") || b.includes("connect.facebook.net")) tech.analytics.push("Facebook Pixel");
   if (b.includes("hotjar")) tech.analytics.push("Hotjar");
@@ -164,7 +217,6 @@ function detectTechnologies(headers: Record<string, string>, body: string): Tech
   if (b.includes("matomo") || b.includes("piwik")) tech.analytics.push("Matomo");
   if (b.includes("amplitude")) tech.analytics.push("Amplitude");
 
-  // JS Libraries
   if (b.includes("jquery") && !b.includes("jqueryui")) tech.javascript.push("jQuery");
   if (b.includes("bootstrap")) tech.javascript.push("Bootstrap");
   if (b.includes("tailwindcss") || b.includes("tailwind")) tech.javascript.push("Tailwind CSS");
@@ -172,7 +224,6 @@ function detectTechnologies(headers: Record<string, string>, body: string): Tech
   if (b.includes("gsap") || b.includes("greensock")) tech.javascript.push("GSAP");
   if (b.includes("three.js") || b.includes("threejs")) tech.javascript.push("Three.js");
 
-  // Deduplicate
   tech.frameworks = [...new Set(tech.frameworks)];
   tech.cms = [...new Set(tech.cms)];
   tech.cdn = [...new Set(tech.cdn)];
@@ -180,7 +231,6 @@ function detectTechnologies(headers: Record<string, string>, body: string): Tech
   return tech;
 }
 
-// Security headers analysis
 interface SecurityHeadersResult {
   hsts: boolean;
   xFrameOptions: boolean;
@@ -214,7 +264,6 @@ function analyzeSecurityHeaders(headers: Record<string, string>): { headers: Sec
   return { headers: result, grade };
 }
 
-// Performance grading
 function gradePerformance(ttfb: number): string {
   if (ttfb < 200) return "Excellent";
   if (ttfb < 500) return "Good";
@@ -222,7 +271,6 @@ function gradePerformance(ttfb: number): string {
   return "Slow";
 }
 
-// Full site fetch — GET request to collect headers + body
 async function fetchSiteData(domain: string): Promise<{
   isUp: boolean;
   statusCode: number;
@@ -245,7 +293,7 @@ async function fetchSiteData(domain: string): Promise<{
         method: "GET",
         redirect: "follow",
         signal: AbortSignal.timeout(12000),
-        headers: { "User-Agent": "HostingCheckerBot/1.0" },
+        headers: { "User-Agent": "SiteHostFinderBot/1.0" },
       });
       const responseTime = Date.now() - start;
       const body = await resp.text();
@@ -254,8 +302,6 @@ async function fetchSiteData(domain: string): Promise<{
 
       const contentLength = parseInt(headerObj["content-length"] || "0") || body.length;
 
-      // SSL info — we can't directly inspect TLS certs from Deno fetch,
-      // but we can infer from the protocol used and check headers
       const ssl = {
         issuer: protocol === "https" ? "Valid SSL" : "No SSL",
         protocol: protocol === "https" ? "TLS" : "None",
@@ -268,7 +314,7 @@ async function fetchSiteData(domain: string): Promise<{
         statusCode: resp.status,
         responseTime,
         headers: headerObj,
-        body: body.substring(0, 100000), // limit to ~100KB
+        body: body.substring(0, 100000),
         contentLength,
         ssl,
       };
@@ -279,9 +325,7 @@ async function fetchSiteData(domain: string): Promise<{
   return defaultResult;
 }
 
-// Favicon extraction
 function extractFavicon(domain: string, body: string): string {
-  // Try to find favicon in HTML
   const iconMatch = body.match(/<link[^>]*rel=["'](?:shortcut )?icon["'][^>]*href=["']([^"']+)["']/i)
     || body.match(/<link[^>]*href=["']([^"']+)["'][^>]*rel=["'](?:shortcut )?icon["']/i);
 
@@ -292,7 +336,6 @@ function extractFavicon(domain: string, body: string): string {
     return `https://${domain}${href.startsWith("/") ? "" : "/"}${href}`;
   }
 
-  // Fallback to Google's favicon service
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
 }
 
@@ -312,15 +355,18 @@ serve(async (req) => {
 
     const cleanDomain = domain.replace(/^(https?:\/\/)?(www\.)?/, "").split("/")[0].split("?")[0];
 
-    // Run all lookups in parallel
-    const [aRecords, nsRecords, mxRecords, siteData] = await Promise.all([
+    // Run all lookups in parallel — now includes TXT, AAAA, CNAME and WHOIS
+    const [aRecords, aaaaRecords, nsRecords, mxRecords, txtRecords, cnameRecords, siteData, whois] = await Promise.all([
       resolveDNS(cleanDomain, "A"),
+      resolveDNS(cleanDomain, "AAAA"),
       resolveDNS(cleanDomain, "NS"),
       resolveDNS(cleanDomain, "MX"),
+      resolveDNS(cleanDomain, "TXT"),
+      resolveDNS(cleanDomain, "CNAME"),
       fetchSiteData(cleanDomain),
+      fetchWhois(cleanDomain),
     ]);
 
-    // IP geolocation
     const ipAddress = aRecords[0] || "";
     let serverLocation = { country: "Unknown", city: "Unknown", lat: 0, lon: 0, isp: "", org: "" };
 
@@ -351,7 +397,14 @@ serve(async (req) => {
       ipAddress,
       hostingProvider,
       serverLocation,
-      dns: { a: aRecords, ns: nsRecords, mx: mxRecords },
+      dns: {
+        a: aRecords,
+        aaaa: aaaaRecords,
+        ns: nsRecords,
+        mx: mxRecords,
+        txt: txtRecords,
+        cname: cnameRecords,
+      },
       siteStatus: {
         isUp: siteData.isUp,
         statusCode: siteData.statusCode,
@@ -368,6 +421,7 @@ serve(async (req) => {
       },
       favicon,
       emailProvider,
+      whois,
       screenshot: `https://image.thum.io/get/width/600/crop/400/https://${cleanDomain}`,
     };
 
@@ -376,7 +430,7 @@ serve(async (req) => {
     });
   } catch (err) {
     console.error("Hosting lookup error:", err);
-    return new Response(JSON.stringify({ error: "Lookup failed" }), {
+    return new Response(JSON.stringify({ error: "Lookup failed. Please check the domain and try again." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
