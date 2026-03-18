@@ -8,7 +8,7 @@ export function SchemaMarkup() {
     name: "Site Host Finder",
     url: "https://site-host-finder.vercel.app",
     description:
-      "Free hosting checker tool to find out who hosts any website. Instantly discover the hosting provider, IP address, server location, and DNS records for any domain.",
+      "Free hosting checker and DNS lookup tool. Find out who hosts any website, view WHOIS data, DNS records (A, AAAA, MX, TXT, CNAME, NS), security headers, SSL status, and performance metrics.",
     applicationCategory: "WebApplication",
     operatingSystem: "All",
     offers: {
@@ -21,11 +21,15 @@ export function SchemaMarkup() {
       "Hosting provider detection",
       "IP address lookup",
       "Server geolocation",
-      "DNS record viewer (A, AAAA, MX, NS, TXT)",
+      "DNS record viewer (A, AAAA, MX, NS, TXT, CNAME)",
+      "WHOIS domain registration lookup",
+      "Domain age checker",
       "Security header analysis",
       "Performance grade estimation",
       "SSL certificate check",
       "Nameserver identification",
+      "Email provider detection",
+      "Technology stack detection",
     ],
   };
 
@@ -57,7 +61,7 @@ export function SchemaMarkup() {
     url: "https://site-host-finder.vercel.app",
     logo: "https://site-host-finder.vercel.app/favicon.ico",
     description:
-      "Free web hosting lookup tools for developers, SEO professionals, and website owners.",
+      "Free web hosting lookup, DNS records, WHOIS, and security analysis tools for developers, SEO professionals, and website owners.",
   };
 
   const faqSchema = {
@@ -78,7 +82,7 @@ export function SchemaMarkup() {
     "@type": "HowTo",
     name: "How to Check Who Hosts a Website",
     description:
-      "Find any website's hosting provider in four simple steps using our free hosting checker tool.",
+      "Find any website's hosting provider, DNS records, and WHOIS information in four simple steps using our free hosting checker tool.",
     step: steps.map((step, i) => ({
       "@type": "HowToStep",
       position: i + 1,

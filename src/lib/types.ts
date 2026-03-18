@@ -12,8 +12,11 @@ export interface HostingResult {
   };
   dns: {
     a: string[];
+    aaaa: string[];
     ns: string[];
     mx: string[];
+    txt: string[];
+    cname: string[];
   };
   siteStatus: {
     isUp: boolean;
@@ -51,4 +54,12 @@ export interface HostingResult {
   favicon: string;
   emailProvider: string;
   screenshot: string;
+  whois: {
+    registrar: string;
+    createdDate: string;
+    expiryDate: string;
+    updatedDate: string;
+    domainAge: string;
+    registrant: string;
+  };
 }
