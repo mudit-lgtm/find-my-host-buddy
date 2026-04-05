@@ -8,7 +8,7 @@ export function SchemaMarkup() {
     name: "Site Host Finder",
     url: "https://site-host-finder.vercel.app",
     description:
-      "Free hosting checker and DNS lookup tool. Find out who hosts any website, view WHOIS data, DNS records (A, AAAA, MX, TXT, CNAME, NS), security headers, SSL status, and performance metrics.",
+      "Free hosting checker and DNS lookup tool. Find website host, check hosting provider, view DNS records, WHOIS data, IP address, server location, domain age, and website status instantly.",
     applicationCategory: "WebApplication",
     operatingSystem: "All",
     offers: {
@@ -18,19 +18,21 @@ export function SchemaMarkup() {
     },
     browserRequirements: "Requires JavaScript. Works in all modern browsers.",
     featureList: [
-      "Hosting provider detection",
-      "IP address lookup",
-      "Server geolocation",
+      "Find website host and hosting provider",
+      "IP address lookup and server location",
       "DNS record viewer (A, AAAA, MX, NS, TXT, CNAME)",
-      "WHOIS domain registration lookup",
-      "Domain age checker",
-      "Security header analysis",
-      "Performance grade estimation",
-      "SSL certificate check",
-      "Nameserver identification",
-      "Email provider detection",
+      "WHOIS domain registration and domain age lookup",
+      "Website hosting checker and web host checker",
+      "Security header analysis and SSL check",
+      "Performance grade and TTFB estimation",
+      "Email provider and MX record detection",
       "Technology stack detection",
+      "Domain hosting comparison tool",
+      "Host finder by IP address",
+      "Nameserver identification",
+      "Free hosting checker online",
     ],
+    keywords: "find website host, host finder, hosting checker, web host checker, website hosting checker, host checker, check website hosting, hosting lookup, where is my website hosted, find hosting provider, hosting finder, who hosts this site, DNS lookup, check host, web hosting search, hosting provider checker, domain host check, hosting check, find hosting, website host finder, web hosting finder, site host checker, hosting checker tool, free hosting checker, domain compare",
   };
 
   const softwareAppSchema = {
@@ -61,7 +63,7 @@ export function SchemaMarkup() {
     url: "https://site-host-finder.vercel.app",
     logo: "https://site-host-finder.vercel.app/favicon.ico",
     description:
-      "Free web hosting lookup, DNS records, WHOIS, and security analysis tools for developers, SEO professionals, and website owners.",
+      "Free web hosting lookup, DNS records, WHOIS, domain comparison, and security analysis tools. Find website host, check hosting provider, and view DNS records instantly.",
   };
 
   const faqSchema = {
@@ -80,9 +82,9 @@ export function SchemaMarkup() {
   const howToSchema = {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    name: "How to Check Who Hosts a Website",
+    name: "How to Find Website Host — Check Who Hosts Any Website",
     description:
-      "Find any website's hosting provider, DNS records, and WHOIS information in four simple steps using our free hosting checker tool.",
+      "Find any website's hosting provider, DNS records, WHOIS information, and IP address in four simple steps using our free hosting checker tool.",
     step: steps.map((step, i) => ({
       "@type": "HowToStep",
       position: i + 1,
@@ -99,8 +101,9 @@ export function SchemaMarkup() {
       { "@type": "ListItem", position: 2, name: "Hosting Checker", item: "https://site-host-finder.vercel.app/#hosting-checker" },
       { "@type": "ListItem", position: 3, name: "How It Works", item: "https://site-host-finder.vercel.app/#how-it-works" },
       { "@type": "ListItem", position: 4, name: "Tools", item: "https://site-host-finder.vercel.app/#tools" },
-      { "@type": "ListItem", position: 5, name: "FAQ", item: "https://site-host-finder.vercel.app/#faq" },
-      { "@type": "ListItem", position: 6, name: "Hosting Guide", item: "https://site-host-finder.vercel.app/#hosting-guide" },
+      { "@type": "ListItem", position: 5, name: "Domain Compare", item: "https://site-host-finder.vercel.app/compare" },
+      { "@type": "ListItem", position: 6, name: "FAQ", item: "https://site-host-finder.vercel.app/#faq" },
+      { "@type": "ListItem", position: 7, name: "Hosting Guide", item: "https://site-host-finder.vercel.app/#hosting-guide" },
     ],
   };
 
