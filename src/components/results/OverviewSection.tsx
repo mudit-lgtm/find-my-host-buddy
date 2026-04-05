@@ -1,4 +1,5 @@
 import { ResultCard } from "@/components/ResultCard";
+import { CopyButton } from "@/components/CopyButton";
 import { Badge } from "@/components/ui/badge";
 import { Server, MapPin, Activity } from "lucide-react";
 import type { HostingResult } from "@/lib/types";
@@ -9,7 +10,10 @@ export function OverviewSection({ data }: { data: HostingResult }) {
       <div className="md:col-span-2 animate-fade-in animate-fade-in-delay-1">
         <ResultCard title="Hosting Provider" icon={Server} variant="hero">
           <p className="text-xl sm:text-2xl font-display font-bold text-foreground">{data.hostingProvider}</p>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">IP: {data.ipAddress}</p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground">IP: {data.ipAddress}</p>
+            <CopyButton text={data.ipAddress} />
+          </div>
         </ResultCard>
       </div>
       <div className="animate-fade-in animate-fade-in-delay-2">
@@ -17,7 +21,10 @@ export function OverviewSection({ data }: { data: HostingResult }) {
           <p className="text-lg sm:text-xl font-display font-semibold text-foreground">
             {data.serverLocation.city}, {data.serverLocation.country}
           </p>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">ISP: {data.serverLocation.isp}</p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground">ISP: {data.serverLocation.isp}</p>
+            <CopyButton text={data.serverLocation.isp} />
+          </div>
           <p className="text-xs sm:text-sm text-muted-foreground">Org: {data.serverLocation.org}</p>
         </ResultCard>
       </div>
