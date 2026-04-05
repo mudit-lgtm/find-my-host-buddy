@@ -1,4 +1,5 @@
 import { ResultCard } from "@/components/ResultCard";
+import { CopyButton } from "@/components/CopyButton";
 import { FileText } from "lucide-react";
 import type { HostingResult } from "@/lib/types";
 
@@ -35,9 +36,12 @@ export function WhoisSection({ data }: { data: HostingResult }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <span className="text-sm font-display font-semibold text-foreground truncate">{value}</span>
+    <div className="flex items-center gap-1">
+      <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+        <span className="text-sm font-display font-semibold text-foreground truncate">{value}</span>
+      </div>
+      {value && value !== "N/A" && <CopyButton text={value} className="shrink-0 opacity-0 hover:opacity-100" />}
     </div>
   );
 }

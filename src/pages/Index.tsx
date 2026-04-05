@@ -7,15 +7,16 @@ import { HowToSection } from "@/components/HowToSection";
 import { TrustFactors } from "@/components/TrustFactors";
 import { SEOContent } from "@/components/SEOContent";
 import { SchemaMarkup } from "@/components/SchemaMarkup";
-import { Server, Globe, Wifi, Search, Shield, Activity } from "lucide-react";
+import { Server, Globe, Wifi, Search, Shield, Activity, ArrowRightLeft } from "lucide-react";
 
 const tools = [
   { title: "Hosting Checker", description: "Find out who hosts any website", icon: Server, href: "/" },
-  { title: "DNS Lookup", description: "View DNS records for any domain", icon: Globe, href: "#", comingSoon: true },
-  { title: "Is It Up or Down?", description: "Check if a website is online", icon: Activity, href: "#", comingSoon: true },
-  { title: "What Is My IP", description: "Find your public IP address", icon: Wifi, href: "#", comingSoon: true },
-  { title: "Reverse Image Search", description: "Search the web by image", icon: Search, href: "#", comingSoon: true },
-  { title: "Port Checker", description: "Check if a port is open", icon: Shield, href: "#", comingSoon: true },
+  { title: "DNS Lookup", description: "View DNS records for any domain", icon: Globe, href: "/" },
+  { title: "Is It Up or Down?", description: "Check if a website is online", icon: Activity, href: "/" },
+  { title: "What Is My IP", description: "Find your public IP address", icon: Wifi, href: "/" },
+  { title: "Reverse Image Search", description: "Search the web by image", icon: Search, href: "/" },
+  { title: "Port Checker", description: "Check if a port is open", icon: Shield, href: "/" },
+  { title: "Domain Compare", description: "Compare hosting of two domains side by side", icon: ArrowRightLeft, href: "/compare" },
 ];
 
 const Index = () => {
@@ -36,7 +37,7 @@ const Index = () => {
               <span className="text-primary">any website</span>
             </h1>
             <p className="mt-4 text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl">
-              Enter a domain or URL to instantly discover the hosting provider, IP address, server location, and more.
+              Enter a domain or URL to instantly discover the hosting provider, IP address, server location, DNS records, and more.
             </p>
             <div className="mt-8 w-full flex justify-center">
               <SearchBar />
