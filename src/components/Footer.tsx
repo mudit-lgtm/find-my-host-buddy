@@ -1,5 +1,4 @@
 import { Globe } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const toolLinks = [
   { label: "Hosting Checker", href: "/#hosting-checker" },
