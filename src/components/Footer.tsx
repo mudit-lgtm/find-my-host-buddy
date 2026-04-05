@@ -2,10 +2,11 @@ import { Globe } from "lucide-react";
 
 const toolLinks = [
   { label: "Hosting Checker", href: "/#hosting-checker" },
-  { label: "DNS Lookup", href: "#" },
-  { label: "Is It Up or Down?", href: "#" },
-  { label: "What Is My IP", href: "#" },
-  { label: "Port Checker", href: "#" },
+  { label: "DNS Lookup", href: "/#hosting-checker" },
+  { label: "Is It Up or Down?", href: "/#hosting-checker" },
+  { label: "What Is My IP", href: "/#hosting-checker" },
+  { label: "Domain Compare", href: "/compare" },
+  { label: "Port Checker", href: "/#hosting-checker" },
 ];
 
 const resourceLinks = [
@@ -15,13 +16,13 @@ const resourceLinks = [
 ];
 
 const externalLinks = [
+  { label: "Hostinger — Best Hosting Deals", href: "https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW", rel: "noopener noreferrer" },
   { label: "ICANN — Domain Registration", href: "https://www.icann.org", rel: "noopener noreferrer" },
   { label: "Cloudflare — What is DNS?", href: "https://www.cloudflare.com/learning/dns/what-is-dns/", rel: "noopener noreferrer" },
   { label: "W3Techs — Hosting Stats", href: "https://w3techs.com/technologies/overview/web_hosting", rel: "noopener noreferrer" },
   { label: "Google PageSpeed", href: "https://developers.google.com/speed/docs/insights/v5/about", rel: "noopener noreferrer" },
   { label: "Let's Encrypt — Free SSL", href: "https://letsencrypt.org/", rel: "noopener noreferrer" },
   { label: "SSL Labs — SSL Test", href: "https://www.ssllabs.com/ssltest/", rel: "noopener noreferrer" },
-  { label: "Google Web Vitals", href: "https://web.dev/articles/vitals", rel: "noopener noreferrer" },
 ];
 
 export function Footer() {
@@ -36,7 +37,7 @@ export function Footer() {
               Site Host Finder
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Free hosting lookup tool. Find out who hosts any website instantly.
+              Free hosting checker & DNS lookup tool. Find website host, check hosting provider, view DNS records, and WHOIS data instantly.
             </p>
           </div>
 
@@ -84,7 +85,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Site Host Finder. All rights reserved. Free website hosting checker tool.</p>
+          <p>© {new Date().getFullYear()} Site Host Finder. All rights reserved. Free website hosting checker & DNS lookup tool.</p>
         </div>
       </div>
     </footer>
