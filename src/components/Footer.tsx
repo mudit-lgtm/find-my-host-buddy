@@ -3,10 +3,10 @@ import { Globe } from "lucide-react";
 const toolLinks = [
   { label: "Hosting Checker", href: "/#hosting-checker" },
   { label: "DNS Lookup", href: "/#hosting-checker" },
-  { label: "Is It Up or Down?", href: "/#hosting-checker" },
-  { label: "What Is My IP", href: "/#hosting-checker" },
-  { label: "Domain Compare", href: "/compare" },
-  { label: "Port Checker", href: "/#hosting-checker" },
+  { label: "Is It Up or Down?", href: "/#tools" },
+  { label: "What Is My IP", href: "/#tools" },
+  { label: "Domain Compare", href: "/#compare" },
+  { label: "Port Checker", href: "/#tools" },
 ];
 
 const resourceLinks = [
@@ -15,29 +15,36 @@ const resourceLinks = [
   { label: "Hosting Guide", href: "/#hosting-guide" },
 ];
 
+const policyLinks = [
+  { label: "Privacy Policy", href: "/#privacy-policy" },
+  { label: "Terms of Service", href: "/#terms" },
+  { label: "About Us", href: "/#about" },
+  { label: "Contact", href: "/#contact" },
+];
+
 const externalLinks = [
   { label: "Hostinger — Best Hosting Deals", href: "https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW", rel: "noopener noreferrer" },
   { label: "ICANN — Domain Registration", href: "https://www.icann.org", rel: "noopener noreferrer" },
   { label: "Cloudflare — What is DNS?", href: "https://www.cloudflare.com/learning/dns/what-is-dns/", rel: "noopener noreferrer" },
-  { label: "W3Techs — Hosting Stats", href: "https://w3techs.com/technologies/overview/web_hosting", rel: "noopener noreferrer" },
   { label: "Google PageSpeed", href: "https://developers.google.com/speed/docs/insights/v5/about", rel: "noopener noreferrer" },
   { label: "Let's Encrypt — Free SSL", href: "https://letsencrypt.org/", rel: "noopener noreferrer" },
-  { label: "SSL Labs — SSL Test", href: "https://www.ssllabs.com/ssltest/", rel: "noopener noreferrer" },
 ];
 
 export function Footer() {
   return (
     <footer className="border-t bg-card py-12 mt-auto">
       <div className="container max-w-5xl mx-auto px-4">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
-          <div>
+          <div className="lg:col-span-1">
             <div className="flex items-center gap-2 font-display font-bold text-foreground mb-3">
-              <Globe className="h-4 w-4 text-primary" />
-              Site Host Finder
+              <div className="flex h-5 w-5 items-center justify-center rounded bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500">
+                <Globe className="h-3 w-3 text-white" />
+              </div>
+              <span className="text-gradient">Site Host Finder</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Free hosting checker & DNS lookup tool. Find website host, check hosting provider, view DNS records, and WHOIS data instantly.
+              Free hosting checker & DNS lookup tool.
             </p>
           </div>
 
@@ -60,6 +67,20 @@ export function Footer() {
             <h3 className="font-display font-semibold text-foreground mb-3 text-sm">Resources</h3>
             <ul className="space-y-2">
               {resourceLinks.map((link) => (
+                <li key={link.label}>
+                  <a href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="font-display font-semibold text-foreground mb-3 text-sm">Legal</h3>
+            <ul className="space-y-2">
+              {policyLinks.map((link) => (
                 <li key={link.label}>
                   <a href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.label}

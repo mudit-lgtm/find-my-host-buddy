@@ -41,13 +41,22 @@ export default function Results() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const showHostingerCTA = data && (
+    data.performance?.grade === "C" ||
+    data.performance?.grade === "D" ||
+    data.performance?.grade === "F" ||
+    data.securityGrade === "C" ||
+    data.securityGrade === "D" ||
+    data.securityGrade === "F"
+  );
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
 
       <main className="flex-1">
         {/* Search header */}
-        <section className="bg-gradient-to-b from-primary/5 to-background py-6 sm:py-10">
+        <section className="hero-gradient py-6 sm:py-10">
           <div className="container max-w-5xl mx-auto px-4 flex flex-col items-center gap-4">
             <div className="flex items-center gap-2.5 sm:gap-3">
               {data?.favicon && (
@@ -59,7 +68,7 @@ export default function Results() {
                 />
               )}
               <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-                Results for <span className="text-primary">{decodedDomain}</span>
+                Results for <span className="text-gradient">{decodedDomain}</span>
               </h1>
             </div>
             <div className="w-full flex justify-center">
@@ -108,6 +117,36 @@ export default function Results() {
                 <SectionLabel>Technical Details</SectionLabel>
                 <DnsRecordsSection data={data} />
               </div>
+
+              {/* Hostinger recommendation */}
+              {showHostingerCTA ? (
+                <div className="rounded-xl border-2 border-orange-300 bg-gradient-to-r from-orange-50 to-amber-50 p-6 text-center">
+                  <p className="font-display font-bold text-foreground text-lg mb-1">⚡ Upgrade Your Hosting</p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Your site's performance or security could be improved. Switch to a faster, more secure hosting provider.
+                  </p>
+                  <a
+                    href="https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-display font-semibold hover:opacity-90 transition-opacity shadow-lg"
+                  >
+                    🚀 Try Hostinger — Fast & Affordable →
+                  </a>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5 p-5 text-center">
+                  <p className="text-sm text-muted-foreground mb-2">Looking for reliable hosting?</p>
+                  <a
+                    href="https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary to-blue-600 text-primary-foreground font-display font-semibold text-sm hover:opacity-90 transition-opacity"
+                  >
+                    Try Hostinger — Fast & Affordable Hosting →
+                  </a>
+                </div>
+              )}
             </div>
           )}
         </section>

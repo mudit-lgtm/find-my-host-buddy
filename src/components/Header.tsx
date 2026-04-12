@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Globe, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +10,7 @@ import { useState } from "react";
 
 const navLinks = [
   { label: "Hosting Checker", href: "/#hosting-checker" },
-  { label: "Compare", href: "/compare" },
+  { label: "Compare", href: "/#compare" },
   { label: "How It Works", href: "/#how-it-works" },
   { label: "Tools", href: "/#tools" },
   { label: "FAQ", href: "/#faq" },
@@ -24,13 +23,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
       <div className="container max-w-5xl mx-auto flex h-14 items-center justify-between px-4">
-        <Link
-          to="/"
-          className="flex items-center gap-2 font-display font-bold text-lg text-foreground"
+        <a
+          href="/"
+          className="flex items-center gap-2 font-display font-bold text-lg"
         >
-          <Globe className="h-5 w-5 text-primary" />
-          Site Host Finder
-        </Link>
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500">
+            <Globe className="h-4 w-4 text-white" />
+          </div>
+          <span className="text-gradient">Site Host Finder</span>
+        </a>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1">
