@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/go/hostinger",
+      "destination": "https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW",
+      "statusCode": 302
+    }
+  ]
+}
