@@ -45,7 +45,7 @@ const Index = () => {
               <SearchBar />
             </div>
             <a
-              href="https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW"
+              href="/go/hostinger"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-primary/20 text-sm text-muted-foreground hover:text-foreground transition-colors"
