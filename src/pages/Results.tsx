@@ -128,7 +128,7 @@ export default function Results() {
                   <a
                     href="/go/hostinger"
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="nofollow sponsored noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-display font-semibold hover:opacity-90 transition-opacity shadow-lg"
                   >
                     🚀 Try Hostinger — Fast & Affordable →
@@ -140,7 +140,7 @@ export default function Results() {
                   <a
                     href="/go/hostinger"
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="nofollow sponsored noopener noreferrer"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary to-blue-600 text-primary-foreground font-display font-semibold text-sm hover:opacity-90 transition-opacity"
                   >
                     Try Hostinger — Fast & Affordable Hosting →
