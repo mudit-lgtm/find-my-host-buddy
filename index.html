@@ -137,7 +137,69 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static prerendered content for SEO crawlers and AdSense. Replaced once React hydrates. -->
+      <noscript>
+        <p style="text-align:center;padding:1rem;background:#fef3c7;color:#92400e;">This site works best with JavaScript enabled. Most features still work without it.</p>
+      </noscript>
+      <header style="padding:1rem 1.5rem;border-bottom:1px solid #e5e7eb;">
+        <strong>Site Host Finder</strong> — Free Hosting Checker, DNS Lookup &amp; WHOIS Tool
+      </header>
+      <main style="max-width:960px;margin:0 auto;padding:2rem 1.5rem;font-family:system-ui,-apple-system,sans-serif;line-height:1.6;color:#111827;">
+        <section id="hosting-checker">
+          <h1>Find Out Who Hosts Any Website — Free Hosting Checker</h1>
+          <p>Site Host Finder is a free online tool that instantly identifies the web hosting provider behind any website. Enter a domain name or URL and we'll show you the hosting company, IP address, server location, nameservers, DNS records (A, AAAA, MX, NS, TXT, CNAME), WHOIS registration data, domain age, SSL/security headers, and a performance grade — all in seconds.</p>
+          <p>Whether you're researching a competitor, troubleshooting your own site, or shopping for a new hosting provider, our hosting checker gives you accurate, real-time results without any signup. We cross-reference IP addresses against a database of hundreds of hosting companies including AWS, Google Cloud, Cloudflare, Hostinger, DigitalOcean, Vercel, Netlify, GoDaddy, Bluehost, SiteGround, and many more.</p>
+        </section>
+
+        <section id="how-it-works">
+          <h2>How to Check Who Hosts a Website</h2>
+          <ol>
+            <li><strong>Enter the Domain or URL</strong> — Type or paste any website address into the search bar. Full URLs and bare domains both work.</li>
+            <li><strong>Click "Find Host"</strong> — We perform real-time DNS resolution, IP geolocation, and provider matching.</li>
+            <li><strong>Review the Results</strong> — See the hosting provider, server IP, physical location, nameservers, full DNS records, WHOIS data, and security analysis.</li>
+            <li><strong>Use the Information</strong> — Compare providers, research competitors, troubleshoot issues, or verify your own setup.</li>
+          </ol>
+        </section>
+
+        <section id="tools">
+          <h2>Free Webmaster Tools</h2>
+          <ul>
+            <li><strong>Hosting Checker</strong> — Find out who hosts any website.</li>
+            <li><strong>DNS Lookup</strong> — View A, AAAA, MX, NS, TXT, and CNAME records for any domain.</li>
+            <li><strong>WHOIS Lookup</strong> — Check domain registration, registrar, age, and expiry.</li>
+            <li><strong>Is It Up or Down?</strong> — Check whether a website is currently online.</li>
+            <li><strong>What Is My IP</strong> — Find your public IP address and location.</li>
+            <li><strong>Port Checker</strong> — Check if a port is open on a remote host.</li>
+            <li><strong>Domain Compare</strong> — Compare hosting setups of two domains side by side.</li>
+          </ul>
+        </section>
+
+        <section id="compare">
+          <h2>Domain Comparison Tool</h2>
+          <p>Side-by-side comparison of two domains showing their hosting providers, server locations, nameservers, IP addresses, and DNS configurations. Perfect for competitor research and migration planning.</p>
+        </section>
+
+        <section id="faq">
+          <h2>Frequently Asked Questions</h2>
+          <h3>How do I find out who hosts a website?</h3>
+          <p>Enter the website's domain into our hosting checker. We resolve the DNS, identify the IP address, and match it against our database of known hosting providers.</p>
+          <h3>Is this hosting checker free?</h3>
+          <p>Yes — 100% free, no signup required, with unlimited lookups.</p>
+          <h3>What information does the hosting checker show?</h3>
+          <p>Hosting provider, server IP, physical server location, nameservers, full DNS records (A, AAAA, MX, NS, TXT, CNAME), WHOIS data, domain age, SSL/security headers, and a performance grade.</p>
+          <h3>Why does Cloudflare show as the host?</h3>
+          <p>If a website uses Cloudflare's CDN, DNS resolves to Cloudflare's edge servers. The actual origin host is hidden behind the Cloudflare network.</p>
+          <h3>Can I check the hosting of any website worldwide?</h3>
+          <p>Yes — our tool works with any publicly accessible domain.</p>
+        </section>
+
+        <section id="hosting-guide">
+          <h2>Hosting Guide — Choosing a Web Host</h2>
+          <p>Web hosting types include shared hosting, VPS, dedicated servers, cloud hosting, and managed WordPress hosting. When choosing a provider, consider uptime, page load speed, customer support, scalability, and pricing. Use our hosting checker to research what providers popular websites trust.</p>
+        </section>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
