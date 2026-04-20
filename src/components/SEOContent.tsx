@@ -15,7 +15,7 @@ export function SEOContent() {
             Amazon Web Services (AWS)
           </a>
           , Google Cloud, Cloudflare, and{" "}
-          <a href="/go/hostinger" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+          <a href="/go/hostinger" target="_blank" rel="nofollow sponsored noopener noreferrer" className="text-primary hover:underline">
             Hostinger
           </a>
           . Check{" "}
@@ -40,7 +40,7 @@ export function SEOContent() {
         </p>
         <ul className="list-disc pl-6 space-y-2">
           <li><strong>Shared Hosting</strong> — Multiple websites share a single server. Affordable and great for beginners. Providers like{" "}
-            <a href="/go/hostinger" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+            <a href="/go/hostinger" target="_blank" rel="nofollow sponsored noopener noreferrer" className="text-primary hover:underline">
               Hostinger
             </a>{" "}
             offer excellent shared hosting plans.
@@ -80,7 +80,7 @@ export function SEOContent() {
           Migrating to a new host involves backing up your files, setting up the new account, uploading your site, and updating nameservers. Keep old hosting active until{" "}
           <a href="https://www.cloudflare.com/learning/dns/dns-propagation/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">DNS propagation</a>{" "}
           completes. Looking for reliable hosting?{" "}
-          <a href="/go/hostinger" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+          <a href="/go/hostinger" target="_blank" rel="nofollow sponsored noopener noreferrer" className="text-primary hover:underline">
             Hostinger offers fast, affordable hosting plans
           </a>{" "}
           with free migration. Use our <strong>website hosting checker</strong> before and after to verify the switch.
@@ -122,7 +122,7 @@ export function SEOContent() {
         </h3>
         <p>
           Consider uptime guarantees, page load speed, customer support, scalability, and pricing. Use our <strong>domain compare</strong> tool to research what providers popular websites use. For beginners,{" "}
-          <a href="/go/hostinger" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+          <a href="/go/hostinger" target="_blank" rel="nofollow sponsored noopener noreferrer" className="text-primary hover:underline">
             Hostinger
           </a>{" "}
           offers an excellent balance of speed, features, and affordability.
