@@ -100,9 +100,9 @@ const Index = () => {
             <h3 className="font-display font-bold text-foreground">Information We Collect</h3>
             <p>We do not collect personal information. Domain lookups are processed in real-time and not stored. We use Google AdSense, which may use cookies to serve personalized ads. Google's use of advertising cookies enables it to serve ads based on your visits to this and other sites.</p>
             <h3 className="font-display font-bold text-foreground">Cookies</h3>
-            <p>We use cookies for analytics (if enabled) and advertising through Google AdSense. You can opt out of personalized advertising by visiting Google's <a href="https://adssettings.google.com" target="_blank" rel="nofollow sponsored noopener noreferrer" className="text-primary hover:underline">Ads Settings</a>.</p>
+            <p>We use cookies for analytics (if enabled) and advertising through Google AdSense. You can opt out of personalized advertising by visiting Google's <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Ads Settings</a>.</p>
             <h3 className="font-display font-bold text-foreground">Third-Party Services</h3>
-            <p>We use Google AdSense for advertising. Third-party vendors, including Google, use cookies to serve ads. You may opt out at <a href="https://www.aboutads.info" target="_blank" rel="nofollow sponsored noopener noreferrer" className="text-primary hover:underline">aboutads.info</a>.</p>
+            <p>We use Google AdSense for advertising. Third-party vendors, including Google, use cookies to serve ads. You may opt out at <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">aboutads.info</a>.</p>
             <h3 className="font-display font-bold text-foreground">Contact</h3>
             <p>For questions about this policy, contact us through the Contact section below.</p>
           </div>
