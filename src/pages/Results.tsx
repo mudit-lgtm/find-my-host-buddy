@@ -126,7 +126,7 @@ export default function Results() {
                     Your site's performance or security could be improved. Switch to a faster, more secure hosting provider.
                   </p>
                   <a
-                    href="https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW"
+                    href="/go/hostinger"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-display font-semibold hover:opacity-90 transition-opacity shadow-lg"
@@ -138,7 +138,7 @@ export default function Results() {
                 <div className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5 p-5 text-center">
                   <p className="text-sm text-muted-foreground mb-2">Looking for reliable hosting?</p>
                   <a
-                    href="https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW"
+                    href="/go/hostinger"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary to-blue-600 text-primary-foreground font-display font-semibold text-sm hover:opacity-90 transition-opacity"

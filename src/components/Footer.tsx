@@ -23,7 +23,7 @@ const policyLinks = [
 ];
 
 const externalLinks = [
-  { label: "Hostinger — Best Hosting Deals", href: "https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW", rel: "noopener noreferrer" },
+  { label: "Hostinger — Best Hosting Deals", href: "/go/hostinger", rel: "noopener noreferrer" },
   { label: "ICANN — Domain Registration", href: "https://www.icann.org", rel: "noopener noreferrer" },
   { label: "Cloudflare — What is DNS?", href: "https://www.cloudflare.com/learning/dns/what-is-dns/", rel: "noopener noreferrer" },
   { label: "Google PageSpeed", href: "https://developers.google.com/speed/docs/insights/v5/about", rel: "noopener noreferrer" },
