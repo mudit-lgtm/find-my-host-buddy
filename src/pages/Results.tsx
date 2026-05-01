@@ -107,76 +107,89 @@ export default function Results() {
           </div>
         </section>
 
-        {/* Results */}
-        <section className="container max-w-5xl mx-auto px-4 py-6 sm:py-10">
-          {isLoading && <ResultsSkeleton />}
+        {/* Native banner below summary */}
+        {data && (
+          <div className="container max-w-5xl mx-auto px-4 pt-4">
+            <AdsterraNative />
+          </div>
+        )}
 
-          {error && (
-            <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center">
-              <p className="font-display font-semibold text-destructive">Lookup Failed</p>
-              <p className="text-sm text-muted-foreground mt-1">{(error as Error).message}</p>
-            </div>
-          )}
+        {/* Results with optional sidebar ad on xl screens */}
+        <section className="container max-w-7xl mx-auto px-4 py-6 sm:py-10 flex gap-6">
+          <div className="flex-1 min-w-0">
+            {isLoading && <ResultsSkeleton />}
 
-          {data && (
-            <div className="space-y-6 sm:space-y-8">
-              <div>
-                <SectionLabel>Overview</SectionLabel>
-                <OverviewSection data={data} />
+            {error && (
+              <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center">
+                <p className="font-display font-semibold text-destructive">Lookup Failed</p>
+                <p className="text-sm text-muted-foreground mt-1">{(error as Error).message}</p>
               </div>
+            )}
 
-              {data.whois && (
+            {data && (
+              <div className="space-y-6 sm:space-y-8">
                 <div>
-                  <SectionLabel>Domain Registration (WHOIS)</SectionLabel>
-                  <WhoisSection data={data} />
+                  <SectionLabel>Overview</SectionLabel>
+                  <OverviewSection data={data} />
                 </div>
-              )}
 
-              <div>
-                <SectionLabel>Security & Performance</SectionLabel>
-                <SecurityPerformanceSection data={data} />
+                {data.whois && (
+                  <div>
+                    <SectionLabel>Domain Registration (WHOIS)</SectionLabel>
+                    <WhoisSection data={data} />
+                  </div>
+                )}
+
+                <div>
+                  <SectionLabel>Security & Performance</SectionLabel>
+                  <SecurityPerformanceSection data={data} />
+                </div>
+
+                <div>
+                  <SectionLabel>Technical Details</SectionLabel>
+                  <DnsRecordsSection data={data} />
+                </div>
+
+                {/* Hostinger recommendation */}
+                {showHostingerCTA ? (
+                  <div className="rounded-xl border-2 border-orange-300 bg-gradient-to-r from-orange-50 to-amber-50 p-6 text-center">
+                    <p className="font-display font-bold text-foreground text-lg mb-1">⚡ Upgrade Your Hosting</p>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Your site's performance or security could be improved. Switch to a faster, more secure hosting provider.
+                    </p>
+                    <a
+                      href="/go/hostinger"
+                      target="_blank"
+                      rel="nofollow sponsored noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-display font-semibold hover:opacity-90 transition-opacity shadow-lg"
+                    >
+                      🚀 Try Hostinger — Fast & Affordable →
+                    </a>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5 p-5 text-center">
+                    <p className="text-sm text-muted-foreground mb-2">Looking for reliable hosting?</p>
+                    <a
+                      href="/go/hostinger"
+                      target="_blank"
+                      rel="nofollow sponsored noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary to-blue-600 text-primary-foreground font-display font-semibold text-sm hover:opacity-90 transition-opacity"
+                    >
+                      Try Hostinger — Fast & Affordable Hosting →
+                    </a>
+                  </div>
+                )}
               </div>
+            )}
+          </div>
 
-              <div>
-                <SectionLabel>Technical Details</SectionLabel>
-                <DnsRecordsSection data={data} />
-              </div>
-
-              {/* Hostinger recommendation */}
-              {showHostingerCTA ? (
-                <div className="rounded-xl border-2 border-orange-300 bg-gradient-to-r from-orange-50 to-amber-50 p-6 text-center">
-                  <p className="font-display font-bold text-foreground text-lg mb-1">⚡ Upgrade Your Hosting</p>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Your site's performance or security could be improved. Switch to a faster, more secure hosting provider.
-                  </p>
-                  <a
-                    href="/go/hostinger"
-                    target="_blank"
-                    rel="nofollow sponsored noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-display font-semibold hover:opacity-90 transition-opacity shadow-lg"
-                  >
-                    🚀 Try Hostinger — Fast & Affordable →
-                  </a>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5 p-5 text-center">
-                  <p className="text-sm text-muted-foreground mb-2">Looking for reliable hosting?</p>
-                  <a
-                    href="/go/hostinger"
-                    target="_blank"
-                    rel="nofollow sponsored noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary to-blue-600 text-primary-foreground font-display font-semibold text-sm hover:opacity-90 transition-opacity"
-                  >
-                    Try Hostinger — Fast & Affordable Hosting →
-                  </a>
-                </div>
-              )}
-            </div>
-          )}
+          {/* Sidebar ad: only on xl */}
+          <AdsterraSidebar />
         </section>
       </main>
 
       <Footer />
+      <StickyMobileAd />
     </div>
   );
 }
