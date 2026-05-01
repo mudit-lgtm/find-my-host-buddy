@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +12,29 @@ import { OverviewSection } from "@/components/results/OverviewSection";
 import { SecurityPerformanceSection } from "@/components/results/SecurityPerformanceSection";
 import { WhoisSection } from "@/components/results/WhoisSection";
 import { DnsRecordsSection } from "@/components/results/DnsRecordsSection";
+import { AdsterraSidebar } from "@/components/AdsterraSidebar";
+import { AdsterraNative } from "@/components/AdsterraNative";
+import { StickyMobileAd } from "@/components/StickyMobileAd";
 import type { HostingResult } from "@/lib/types";
+
+/** Inject noindex meta and canonical pointing to / for /results/* pages. */
+function useNoIndex() {
+  useEffect(() => {
+    const robots = document.createElement("meta");
+    robots.name = "robots";
+    robots.content = "noindex, follow";
+    document.head.appendChild(robots);
+
+    const existingCanonical = document.querySelector('link[rel="canonical"]');
+    const prevHref = existingCanonical?.getAttribute("href") ?? null;
+    if (existingCanonical) existingCanonical.setAttribute("href", "https://site-host-finder.vercel.app/");
+
+    return () => {
+      robots.remove();
+      if (existingCanonical && prevHref) existingCanonical.setAttribute("href", prevHref);
+    };
+  }, []);
+}
 
 async function fetchHostingData(domain: string): Promise<HostingResult> {
   const { data, error } = await supabase.functions.invoke("hosting-lookup", {
@@ -30,6 +53,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default function Results() {
+  useNoIndex();
   const { domain } = useParams<{ domain: string }>();
   const decodedDomain = decodeURIComponent(domain || "");
 
