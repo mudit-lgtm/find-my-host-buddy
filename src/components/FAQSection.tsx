@@ -94,9 +94,20 @@ export function FAQSection() {
       </p>
       <Accordion type="single" collapsible className="w-full">
         {faqs.map((faq, i) => (
-          <AccordionItem key={i} value={`faq-${i}`}>
+          <AccordionItem
+            key={i}
+            value={`faq-${i}`}
+            className="border-l-2 border-l-transparent data-[state=open]:border-l-primary pl-3 transition-colors"
+          >
             <AccordionTrigger className="text-left font-display font-semibold text-foreground">
-              {faq.question}
+              <span className="flex items-center gap-2">
+                {i < 3 && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white">
+                    Popular
+                  </span>
+                )}
+                {faq.question}
+              </span>
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground leading-relaxed">
               {faq.answer}

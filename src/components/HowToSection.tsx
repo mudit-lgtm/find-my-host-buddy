@@ -37,25 +37,30 @@ export function HowToSection() {
         Find any website's hosting provider in four simple steps.
       </p>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {steps.map((step, i) => (
-          <div
-            key={i}
-            className="relative rounded-xl border bg-card p-6 shadow-sm"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary mb-4">
-              <step.icon className="h-5 w-5" />
+        {steps.map((step, i) => {
+          const gradients = [
+            "from-blue-500 to-cyan-500",
+            "from-purple-500 to-pink-500",
+            "from-orange-500 to-amber-500",
+            "from-green-500 to-emerald-500",
+          ];
+          return (
+            <div key={i} className="relative rounded-xl border bg-card p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${gradients[i]} text-white shadow-md mb-4`}>
+                <step.icon className="h-5 w-5" />
+              </div>
+              <span className="absolute top-4 right-4 font-display text-3xl font-bold text-muted/60">
+                {i + 1}
+              </span>
+              <h3 className="font-display font-semibold text-foreground mb-2">
+                {step.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {step.description}
+              </p>
             </div>
-            <span className="absolute top-4 right-4 font-display text-3xl font-bold text-muted/60">
-              {i + 1}
-            </span>
-            <h3 className="font-display font-semibold text-foreground mb-2">
-              {step.title}
-            </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {step.description}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
