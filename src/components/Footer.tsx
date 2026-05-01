@@ -2,11 +2,11 @@ import { Globe } from "lucide-react";
 
 const toolLinks = [
   { label: "Hosting Checker", href: "/#hosting-checker" },
-  { label: "DNS Lookup", href: "/#hosting-checker" },
-  { label: "Is It Up or Down?", href: "/#tools" },
-  { label: "What Is My IP", href: "/#tools" },
+  { label: "DNS Lookup", href: "/#dns-lookup" },
+  { label: "Website Down Checker", href: "/#website-down-checker" },
+  { label: "IP Checker", href: "/#ip-checker" },
+  { label: "Port Checker", href: "/#port-checker" },
   { label: "Domain Compare", href: "/#compare" },
-  { label: "Port Checker", href: "/#tools" },
 ];
 
 const resourceLinks = [
