@@ -1,5 +1,18 @@
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootEl = document.getElementById("root")!;
+const tree = (
+  <HelmetProvider>
+    <App />
+  </HelmetProvider>
+);
+
+// If prerendered HTML exists inside #root, hydrate; otherwise mount fresh.
+if (rootEl.hasChildNodes()) {
+  hydrateRoot(rootEl, tree);
+} else {
+  createRoot(rootEl).render(tree);
+}
