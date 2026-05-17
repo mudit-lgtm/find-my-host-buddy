@@ -1,167 +1,120 @@
-# Polish UI, Add Per-Tool Anchors, Integrate Adsterra & Lock Down /results
+## Goal
 
-## Goals (no SEO content removed)
-
-1. Make the long page feel **graceful & scannable** — wrap dense sections in icon boxes, highlight cards, and collapsible "Read more" panels (content stays in DOM for SEO).
-2. Add **individual hash anchors** for each tool (`#dns-lookup`, `#website-down-checker`, `#ip-checker`, `#port-checker`) so each is indexed separately.
-3. Update **header + footer nav** with all 6 tool anchors.
-4. Integrate **Adsterra ads** (banners + native + popunder + social bar) optimized for mobile and desktop, placed near Hostinger CTAs to maximize affiliate + ad revenue.
-5. Stop `/results/<domain>` URLs from being indexed (keep all current indexed URLs intact).
+Make every route on `site-host-finder.vercel.app` return fully-rendered HTML to Google, ChatGPT, Perplexity, LinkedIn, X, Slack, etc. — without leaving the current Vite + React Router stack. Build dedicated keyword-targeted pages from the GSC data you shared, wire them into nav, sitemap, and schema, and ship a pre-publish SEO audit.
 
 ---
 
-## 1. Visual Polish — "Graceful, Not Lengthy"
+## 1. Static prerendering with react-snap (Vercel-compatible)
 
-**Strategy:** Keep all text in the DOM (Google still sees it) but visually compress with icon cards, gradient highlight boxes, two-column layouts, and a "Show more" toggle on the long Hosting Guide.
+- Install `react-snap` + `react-helmet-async` (already considered).
+- Switch `ReactDOM.render` → `ReactDOM.hydrateRoot` only when prerendered markup exists (react-snap convention).
+- Wrap `App` in `<HelmetProvider>` in `src/main.tsx`.
+- Add `postbuild: "react-snap"` in `package.json` and a `reactSnap` config block listing every route (homepage, 10 tool pages, 4 guides, 5 policy pages). Each route gets a real `dist/<route>/index.html` with full HTML + JSON-LD baked in.
+- Update `vercel.json`:
+  - Keep the `/go/hostinger` 302 redirect.
+  - Add `cleanUrls: true` and `trailingSlash: false` so `/tools/dns-lookup` serves `dist/tools/dns-lookup/index.html` directly (no SPA fallback for those URLs → no deep-link 404, no JS required for crawlers).
+  - Keep SPA fallback only for dynamic `/results/:domain`.
+- Exclude `/results/*` and `/go/*` from prerender + sitemap (already noindex).
 
-### `src/components/SEOContent.tsx` (Hosting Guide)
+## 2. New routes (each = its own URL, unique meta, schema, FAQ, content)
 
-- Convert the 10 H3 sections into a **2-column grid of gradient icon cards** (each card = one topic with icon + heading + paragraph).
-- Wrap the second half (after "Domain Registration vs. Web Hosting") in a `<details>` element styled as a "Read full hosting guide ↓" button. Content stays in initial HTML — `<details>` keeps it crawlable and unhidden.
-- Add lucide icons per topic (Server, Shield, Zap, Globe, Database, etc.).
+Keywords mapped from the GSC export you pasted.
 
-### `src/components/FAQSection.tsx`
+### Tool pages (in header + footer nav)
+```
+/tools/hosting-checker          → "host checker", "hosting checker", "hostchecker"
+/tools/find-website-host        → "find website host", "find my host", "find host of website"
+/tools/where-is-website-hosted  → "where is my website hosted", "where is this site hosted"
+/tools/who-is-hosting           → "who hosts this site", "who is hosting this website"
+/tools/hosting-lookup           → "hosting lookup", "web hosting lookup", "domain hosting lookup"
+/tools/dns-lookup               → DNS records (A, AAAA, MX, NS, TXT)
+/tools/ip-checker               → "ip host checker", "what is my ip"
+/tools/website-down-checker     → "is it up", "site down"
+/tools/port-checker             → open port check
+/tools/domain-compare           → side-by-side two domains
+```
 
-- Already an accordion ✅ — just add a colorful left-border accent per item and a "Popular" badge on the top 3 questions.
+Each tool page reuses the existing edge functions (`hosting-lookup`, `site-status`). Same UI primitives, different copy, different H1, different FAQ, different JSON-LD `SoftwareApplication` + `FAQPage` + `BreadcrumbList`.
 
-### `src/pages/Index.tsx` (Privacy/Terms/About/Contact)
+### Guide pages (in header "Learn" dropdown + footer)
+```
+/guides/what-is-web-hosting
+/guides/shared-vs-vps-vs-cloud-hosting
+/guides/how-to-find-where-a-website-is-hosted   (HowTo schema)
+/guides/best-web-hosting-for-beginners          (affiliate-heavy, cloaked /go/hostinger CTAs)
+```
 
-- Wrap each long policy section in a `<details>` collapsible with a gradient icon header. Content stays in DOM and crawlable.
-- Use a 2-column "info card" grid for About + Contact instead of long paragraphs.
+### Policy pages (footer only — NOT header, per your spec)
+```
+/privacy   /terms   /disclaimer   /about   /contact
+```
 
-### `src/components/HowToSection.tsx`
+## 3. SEO / AEO / GEO content per page
 
-- Already clean ✅ — minor: add gradient backgrounds to step icon containers (matching brand blue→purple→cyan).
+Every new page ships with:
 
-### `src/components/TrustFactors.tsx`
+- **Unique `<title>` ≤60 chars** built around the page's primary keyword.
+- **Unique meta description ≤155 chars** with secondary keyword + benefit.
+- **Single H1** = primary keyword phrased naturally.
+- **H2/H3 cluster** covering related queries from GSC (e.g. the hosting-checker page covers "host check", "check website hosting", "domain host check").
+- **AEO block**: "What is X?", "How does X work?", "Why use X?" — short, direct, answer-engine-friendly paragraphs (40–60 words each) placed near the top.
+- **GEO**: target Global / US per your choice. Schema gets `inLanguage: "en"`, `areaServed: "Worldwide"`; copy uses USD examples and US-centric provider names (AWS, Cloudflare, GoDaddy, Bluehost, Hostinger US).
+- **Contextual inbound links**: each tool page links to 2–3 related tools + 1–2 guides using keyword-rich anchor text.
+- **Contextual outbound links**: 2–3 authoritative refs per page (ICANN, IANA, Cloudflare Learning, RFCs, Hostinger blog) with `rel="noopener"`. Hostinger links route through `/go/hostinger` (cloaked affiliate).
+- **Unique FAQ**: 4–6 questions per page drawn from real GSC long-tails (e.g. "how do I find out who my website host is", "how to check which hosting a website is using") — NOT the same generic FAQ everywhere.
+- **JSON-LD per page**: `WebPage` + `BreadcrumbList` + `FAQPage` + (tool pages) `SoftwareApplication` + (guides) `Article`/`HowTo`.
 
-- Already clean ✅ — no changes.
+## 4. Sitemap + robots
 
----
+- Replace the static `public/sitemap.xml` with a generator script (`scripts/generate-sitemap.ts`) wired to `predev`/`prebuild`. Emits one `<url>` per real route (no more `#hash` URLs, which is what caused your GSC submission error — search engines treat hashes as the same page).
+- `lastmod` = build date; tool pages weekly/0.9; guides monthly/0.7; policy monthly/0.3.
+- `robots.txt`: keep `Disallow: /results/` and `/go/`. Re-confirm `Sitemap:` line is correct. Add `Allow: /tools/` and `/guides/` explicitly.
 
-## 2. Per-Tool Hash Anchors (for individual indexing)
+## 5. Header + Footer navigation
 
-### `src/pages/Index.tsx`
+- **Header**: existing "Tools" dropdown expanded to all 10 tools; new "Learn" dropdown for 4 guides; keep FAQ link.
+- **Footer**: 4 columns — Tools (10) · Learn (4) · Company (About, Contact) · Legal (Privacy, Terms, Disclaimer) · plus the existing external/affiliate column.
+- Every tool page also gets an in-body "Related tools" grid (3–4 cards) → internal link juice flows.
+- Homepage gets a new "All tools" section linking to each `/tools/*` page with descriptive anchor text.
 
-- Split the single `#tools` section into **6 individually-anchored mini-sections** stacked vertically, each with its own `<h2>`, icon header, and short SEO paragraph:
-  - `#hosting-checker` (already exists — hero)
-  - `#dns-lookup` (new — DNS records explainer + link to checker)
-  - `#website-down-checker` (new — embeds the IsItUp inline form, not just dialog)
-  - `#ip-checker` (new — embeds WhatIsMyIP inline)
-  - `#port-checker` (new — embeds PortChecker inline)
-  - `#compare` (already exists)
-- Keep the existing `#tools` overview grid above as a quick-jump menu linking to the 6 anchors.
-- Inline tool forms reuse logic from `ToolDialog.tsx` (extract `IsItUpTool`, `WhatIsMyIPTool`, `PortCheckerTool` into `src/components/tools/` so they render both inline and in dialogs).
+## 6. Pre-publish SEO audit script
 
-### `index.html` static SEO block
+`scripts/seo-audit.ts` (run via `npm run seo:audit`):
 
-- Add matching `<section id="dns-lookup">`, `#website-down-checker`, `#ip-checker`, `#port-checker` blocks with H2 + 1-paragraph descriptions so crawlers see them in raw HTML.
+- Crawls `dist/` after build.
+- For each prerendered HTML file checks: `<title>` present + ≤60c + unique, meta description present + ≤155c + unique, exactly one `<h1>`, canonical present + matches URL, og:title/description/url/type/image present, at least one valid JSON-LD block parses, no `noindex` (except `/results/*`).
+- Outputs `seo-audit-report.json` + a pass/fail console table. Non-zero exit on failure so CI/Vercel build fails before a bad deploy.
 
-### `public/sitemap.xml`
+## 7. Verification checklist (after deploy)
 
-- Add the 4 new hash URLs (keep all existing entries intact).
-
----
-
-## 3. Header + Footer Nav
-
-### `src/components/Header.tsx`
-
-- Replace flat nav with a **"Tools ▾" dropdown** (using existing `navigation-menu` UI primitive) listing all 6 tool anchors. Keep top-level links: Tools (dropdown), How It Works, FAQ, Guide, Compare.
-- Mobile sheet: render the 6 tool anchors as a grouped section under "Tools".
-
-### `src/components/Footer.tsx`
-
-- Update `toolLinks` array to use the 6 dedicated anchors:
-  - Hosting Checker → `/#hosting-checker`
-  - DNS Lookup → `/#dns-lookup`
-  - Website Down Checker → `/#website-down-checker`
-  - IP Checker → `/#ip-checker`
-  - Port Checker → `/#port-checker`
-  - Domain Compare → `/#compare`
-
----
-
-## 4. Adsterra Ad Integration
-
-**Placement strategy** (mobile-first, near high-engagement zones):
-
-
-| Slot                    | Ad                                              | Where                                                                                                                         |
-| ----------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Popunder                | `faa7aff7…js`                                   | `<head>` of `index.html` (fires once per session)                                                                             |
-| Social bar              | `c1f34409…js`                                   | `<head>` of `index.html`                                                                                                      |
-| Native banner container | `5bad8e8d…` invoke + `<div id="container-...">` | Below hero search bar in `Index.tsx` AND on `Results.tsx` below summary banner                                                |
-| 468×60 banner           | `759ffd17…`                                     | Mobile-hidden, desktop-only — top of Hosting Guide section                                                                    |
-| 300×250 rectangle       | `c381d2037…`                                    | Inside FAQ section sidebar (desktop) / between FAQ items 5 & 6 (mobile)                                                       |
-| 160×600 skyscraper      | `2755c8659…`                                    | Desktop-only, fixed sidebar on Results page (right side, sticky)                                                              |
-| 160×300 small           | `caed3321…`                                     | Desktop-only, between tool sections                                                                                           |
-| 320×50 mobile banner    | `f3104055…`                                     | **Sticky bottom on mobile only** (max revenue from mobile users)                                                              |
-| 728×90 leaderboard      | `996d0263…`                                     | Desktop-only, below Hostinger CTA in hero AND above footer                                                                    |
-| Direct link             | `kpskzs0ast?key=…`                              | Wrap "Try Hostinger" CTA secondary button as an alt monetization (every other click, or as a "More hosting deals" link below) |
-
-
-### Implementation
-
-- Create `src/components/AdsterraAd.tsx` — reusable component that injects the `atOptions` script + invoke script into a unique container by key/format/size. Uses `useEffect` to inject scripts once and clean up.
-- Create `src/components/AdsterraNative.tsx` — for the native banner with fixed `id="container-..."`.
-- Create `src/components/StickyMobileAd.tsx` — fixed-bottom 320×50 wrapper using `useIsMobile` hook (already exists).
-- Create `src/components/AdsterraSidebar.tsx` — sticky 160×600 for Results page desktop.
-- Add popunder + social bar scripts directly in `index.html` `<head>` (they're page-level, not inline).
-- Each ad component renders nothing on initial SSR/static HTML (avoids polluting the SEO crawler view).
+1. `curl -A "Googlebot" https://site-host-finder.vercel.app/tools/dns-lookup` → returns full HTML with H1 + FAQ visible in source (no JS execution).
+2. Google Rich Results Test on 3 sample URLs (home, one tool, one guide) → FAQPage + Breadcrumb + SoftwareApplication all pass.
+3. GSC URL Inspection on a tool page → "URL is on Google" or "Eligible" with no soft-404.
+4. Resubmit sitemap in GSC — submission error gone (no more hash URLs).
+5. LinkedIn Post Inspector / X Card Validator on 2 routes → unique preview per page.
 
 ---
 
-## 5. Block /results/* from Indexing
+## Technical details
 
-### `src/pages/Results.tsx`
+**Files to create**
+- `scripts/generate-sitemap.ts`, `scripts/seo-audit.ts`
+- `src/pages/tools/HostingChecker.tsx`, `FindWebsiteHost.tsx`, `WhereIsWebsiteHosted.tsx`, `WhoIsHosting.tsx`, `HostingLookup.tsx`, `DnsLookup.tsx`, `IpChecker.tsx`, `WebsiteDownChecker.tsx`, `PortChecker.tsx`, `DomainCompare.tsx`
+- `src/pages/guides/WhatIsWebHosting.tsx`, `SharedVsVpsVsCloud.tsx`, `HowToFindHost.tsx`, `BestHostingForBeginners.tsx`
+- `src/pages/policy/Privacy.tsx`, `Terms.tsx`, `Disclaimer.tsx`, `About.tsx`, `Contact.tsx`
+- `src/components/SeoHead.tsx` (Helmet wrapper that takes `{title, description, canonical, schema[]}` and emits everything consistently)
+- `src/lib/seo/keywordMap.ts` (single source of truth for title/desc/keywords/FAQ per route — feeds both pages and audit script)
 
-- Add a `<Helmet>`-style meta injection on mount: dynamically set `<meta name="robots" content="noindex, follow">` and update `<link rel="canonical">` to point to `/`. Use a small effect that mutates `document.head` (no react-helmet dep needed).
-- Remove document title bloat.
+**Files to edit**
+- `package.json` — add `react-snap`, `react-helmet-async`, `postbuild`, `predev`, `prebuild`, `seo:audit`, `reactSnap` config block
+- `src/main.tsx` — `hydrateRoot` + `HelmetProvider`
+- `src/App.tsx` — register all new routes
+- `vercel.json` — `cleanUrls`, keep redirect, no SPA rewrite for prerendered paths
+- `src/components/Header.tsx`, `Footer.tsx` — new nav structure
+- `public/robots.txt` — confirm allows
+- Delete static `public/sitemap.xml` (replaced by generator output)
 
-### `public/robots.txt`
-
-- Add `Disallow: /results/` under `User-agent: *` and the specific bot blocks (still allow `/`, `/#*`, `/go/hostinger`).
-
-### `public/sitemap.xml`
-
-- Confirm no `/results/*` entries (currently none ✅).
-
----
-
-## 6. Files Changed Summary
-
-
-| File                                         | Change                                                                                                   |
-| -------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `index.html`                                 | Add Adsterra popunder + social bar in `<head>`; add 4 new static `<section>` blocks for new tool anchors |
-| `public/robots.txt`                          | Add `Disallow: /results/`                                                                                |
-| `public/sitemap.xml`                         | Add 4 new tool-anchor URLs                                                                               |
-| `src/components/Header.tsx`                  | Tools dropdown with 6 anchors                                                                            |
-| `src/components/Footer.tsx`                  | Update toolLinks to 6 dedicated anchors                                                                  |
-| `src/components/SEOContent.tsx`              | 2-col gradient icon cards + collapsible second half                                                      |
-| `src/components/FAQSection.tsx`              | Colored accent + "Popular" badges                                                                        |
-| `src/components/HowToSection.tsx`            | Gradient icon backgrounds                                                                                |
-| `src/pages/Index.tsx`                        | Split tools into 6 anchored sections with inline forms; collapsible policy sections                      |
-| `src/pages/Results.tsx`                      | noindex meta + canonical to `/`; add sidebar ad slot                                                     |
-| `src/components/ToolDialog.tsx`              | Extract tool components for reuse inline                                                                 |
-| `src/components/tools/IsItUp.tsx` (new)      | Reusable component                                                                                       |
-| `src/components/tools/WhatIsMyIP.tsx` (new)  | Reusable component                                                                                       |
-| `src/components/tools/PortChecker.tsx` (new) | Reusable component                                                                                       |
-| `src/components/AdsterraAd.tsx` (new)        | Reusable iframe ad                                                                                       |
-| `src/components/AdsterraNative.tsx` (new)    | Native banner                                                                                            |
-| `src/components/StickyMobileAd.tsx` (new)    | 320×50 sticky mobile bottom                                                                              |
-| `src/components/AdsterraSidebar.tsx` (new)   | 160×600 desktop sidebar                                                                                  |
-
-
----
-
-## What's Preserved (no breaking changes)
-
-- ✅ All indexed URLs: `/`, `/#hosting-checker`, `/#how-it-works`, `/#tools`, `/#why-trust-us` remain valid (sections kept with same IDs)
-- ✅ All JSON-LD schemas in `<head>` untouched
-- ✅ All SEO copy in `index.html` static block + `SEOContent.tsx` + `FAQSection.tsx` kept verbatim — only visual presentation changes
-- ✅ AdSense script untouched (runs alongside Adsterra)
-- ✅ Hostinger affiliate `/go/hostinger` cloaked link untouched
-- ✅ Google Analytics tag untouched
-- the actual work of this website site hosting checker should work properly
+**Caveats**
+- react-snap uses Puppeteer at build time; first Vercel build will be ~1 min slower. Cached after.
+- Dynamic `/results/:domain` stays SPA-only and `noindex` — that's correct, no change.
+- Cloaked `/go/hostinger` 302 stays; all affiliate CTAs across new pages route through it.
