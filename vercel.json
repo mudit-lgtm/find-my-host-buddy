@@ -2,19 +2,17 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    {
-      "source": "/go/hostinger",
-      "destination": "https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW",
-      "statusCode": 302
-    }
+    { "source": "/go/hostinger", "destination": "https://www.hostinger.com/in?REFERRALCODE=YIIMADRASPUW", "statusCode": 302 },
+    { "source": "/tools/hosting-checker", "destination": "/", "statusCode": 301 },
+    { "source": "/tools/hosting-lookup", "destination": "/", "statusCode": 301 },
+    { "source": "/tools/find-website-host", "destination": "/", "statusCode": 301 },
+    { "source": "/tools/where-is-website-hosted", "destination": "/", "statusCode": 301 },
+    { "source": "/tools/who-is-hosting", "destination": "/", "statusCode": 301 }
   ],
   "rewrites": [
-    { "source": "/((?!.*\\.).*)", "destination": "/index.html" }
+    { "source": "/((?!.*\\.|tools/|guides/|privacy|terms|disclaimer|about|contact|go/|results/|sitemap|robots|ads).*)", "destination": "/index.html" }
   ],
   "headers": [
-    {
-      "source": "/sitemap.xml",
-      "headers": [{ "key": "Content-Type", "value": "application/xml" }]
-    }
+    { "source": "/sitemap.xml", "headers": [{ "key": "Content-Type", "value": "application/xml" }] }
   ]
 }
