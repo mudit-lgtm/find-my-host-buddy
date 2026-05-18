@@ -22,8 +22,9 @@ function renderToolWidget(kind: RouteContent["toolComponent"]) {
     case "DomainCompare":
       return <CompareSection />;
     default:
-      // hosting-checker, find-website-host, where-is-hosted, who-is-hosting,
-      // hosting-lookup, dns-lookup all use the main SearchBar -> /results/:domain
+      // DnsLookup, WhoisLookup, SslChecker, HttpHeaders, ReverseIpLookup, CmsDetector,
+      // and the master Hosting checker all run through the SearchBar → /results/:domain
+      // which renders the full hosting/DNS/WHOIS/SSL/headers report.
       return (
         <div className="flex flex-col items-center text-center">
           <SearchBar />
@@ -35,6 +36,34 @@ function renderToolWidget(kind: RouteContent["toolComponent"]) {
   }
 }
 
+function RouteTable({ table }: { table: NonNullable<RouteContent["tables"]>[number] }) {
+  return (
+    <figure className="my-6 overflow-x-auto rounded-lg border bg-card">
+      <table className="w-full text-sm">
+        <caption className="caption-top text-left px-4 py-3 font-semibold text-foreground border-b">
+          {table.caption}
+        </caption>
+        <thead className="bg-muted/40">
+          <tr>
+            {table.headers.map((h) => (
+              <th key={h} scope="col" className="px-4 py-2 text-left font-display font-semibold text-foreground">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((row, i) => (
+            <tr key={i} className="border-t">
+              {row.map((cell, j) => (
+                <td key={j} className="px-4 py-2 text-muted-foreground">{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </figure>
+  );
+}
+
 export default function ToolPage({ route }: { route: RouteContent }) {
   return (
     <div className="flex min-h-screen flex-col">
@@ -42,7 +71,6 @@ export default function ToolPage({ route }: { route: RouteContent }) {
       <Header />
 
       <main className="flex-1">
-        {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="container max-w-5xl mx-auto px-4 pt-4 text-xs text-muted-foreground">
           <ol className="flex items-center gap-1 flex-wrap">
             <li><a href="/" className="hover:text-foreground">Home</a></li>
@@ -53,7 +81,6 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           </ol>
         </nav>
 
-        {/* Hero + tool */}
         <section className="container max-w-3xl mx-auto px-4 py-10 md:py-14">
           <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-center">
             {route.h1}
@@ -66,22 +93,23 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           </div>
         </section>
 
-        {/* Native ad */}
         <div className="container max-w-3xl mx-auto px-4">
           <AdsterraNative />
         </div>
 
-        {/* AEO sections */}
-        <section className="container max-w-3xl mx-auto px-4 py-10 space-y-8">
+        <section className="container max-w-3xl mx-auto px-4 py-10 space-y-6">
           {route.sections.map((s) => (
             <article key={s.heading}>
               <h2 className="font-display text-xl md:text-2xl font-bold mb-3">{s.heading}</h2>
               <p className="text-muted-foreground leading-relaxed">{s.body}</p>
             </article>
           ))}
+          {route.tables?.map((t) => <RouteTable key={t.caption} table={t} />)}
+          <p className="text-sm text-muted-foreground border-l-2 border-primary/40 pl-3 italic">
+            Need faster, more affordable hosting? <a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer" className="text-primary font-semibold hover:underline">Try Hostinger from $2.99/month →</a>
+          </p>
         </section>
 
-        {/* FAQ */}
         {route.faqs.length > 0 && (
           <section className="container max-w-3xl mx-auto px-4 py-10 border-t">
             <h2 className="font-display text-2xl font-bold mb-6">Frequently Asked Questions</h2>
@@ -99,7 +127,6 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           </section>
         )}
 
-        {/* Related tools — inbound link juice */}
         {route.related.length > 0 && (
           <section className="container max-w-3xl mx-auto px-4 py-10 border-t">
             <h2 className="font-display text-xl font-bold mb-4">Related tools & guides</h2>
@@ -115,7 +142,6 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           </section>
         )}
 
-        {/* Outbound authority links */}
         {route.outbound.length > 0 && (
           <section className="container max-w-3xl mx-auto px-4 py-8 border-t">
             <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">Learn more</h2>
