@@ -6,6 +6,34 @@ import { AdsterraNative } from "@/components/AdsterraNative";
 import type { RouteContent } from "@/lib/seo/keywordMap";
 import { ChevronRight } from "lucide-react";
 
+function RouteTable({ table }: { table: NonNullable<RouteContent["tables"]>[number] }) {
+  return (
+    <figure className="my-6 overflow-x-auto rounded-lg border bg-card">
+      <table className="w-full text-sm">
+        <caption className="caption-top text-left px-4 py-3 font-semibold text-foreground border-b">
+          {table.caption}
+        </caption>
+        <thead className="bg-muted/40">
+          <tr>
+            {table.headers.map((h) => (
+              <th key={h} scope="col" className="px-4 py-2 text-left font-display font-semibold text-foreground">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((row, i) => (
+            <tr key={i} className="border-t">
+              {row.map((cell, j) => (
+                <td key={j} className="px-4 py-2 text-muted-foreground">{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </figure>
+  );
+}
+
 export default function GuidePage({ route }: { route: RouteContent }) {
   return (
     <div className="flex min-h-screen flex-col">
@@ -30,13 +58,21 @@ export default function GuidePage({ route }: { route: RouteContent }) {
             <AdsterraNative />
           </div>
 
-          <div className="mt-8 space-y-8">
+          <div className="mt-8 space-y-6">
             {route.sections.map((s) => (
               <section key={s.heading}>
                 <h2 className="font-display text-xl md:text-2xl font-bold mb-3">{s.heading}</h2>
                 <p className="text-muted-foreground leading-relaxed">{s.body}</p>
               </section>
             ))}
+            {route.tables?.map((t) => <RouteTable key={t.caption} table={t} />)}
+            <aside className="rounded-lg border bg-gradient-to-r from-primary/5 to-transparent p-4 text-sm">
+              <strong className="font-display text-foreground">Recommended host:</strong>{" "}
+              <a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer" className="text-primary font-semibold hover:underline">
+                Hostinger from $2.99/month →
+              </a>
+              {" — "}or try our free <a href="/" className="text-primary hover:underline">host checker</a> to see what a competitor is using.
+            </aside>
           </div>
 
           {route.faqs.length > 0 && (

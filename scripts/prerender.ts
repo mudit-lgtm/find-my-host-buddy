@@ -1,15 +1,11 @@
 // Postbuild prerender: for every route in keywordMap, clone dist/index.html into
-// dist/<path>/index.html with title/description/canonical/og/JSON-LD rewritten.
-// Run via: tsx scripts/prerender.ts (wired as `postbuild` in package.json).
+// dist/<path>/index.html with title/description/canonical/og/JSON-LD rewritten
+// and full static body (h1, intro, sections, tables, FAQ) injected into #root.
 //
-// This gives Vercel a real static HTML file per route — Googlebot, ChatGPT,
-// Perplexity, LinkedIn, Slack, and X all see fully-rendered, unique-per-URL HTML
-// without executing JavaScript.
+// Vercel serves the per-route index.html for Googlebot, ChatGPT, Perplexity, etc.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
-import { resolve, dirname } from "path";
-
-// Load route data (compiled-on-the-fly via tsx).
+import { resolve } from "path";
 import { ALL_ROUTES, BASE_URL, type RouteContent } from "../src/lib/seo/keywordMap.ts";
 
 const DIST = resolve("dist");
@@ -22,7 +18,7 @@ if (!existsSync(TEMPLATE_PATH)) {
 
 const template = readFileSync(TEMPLATE_PATH, "utf8");
 
-function escapeHtml(s: string) {
+function esc(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
@@ -66,7 +62,7 @@ function buildSchemas(route: RouteContent, url: string) {
       step: route.sections.map((s, i) => ({ "@type": "HowToStep", position: i + 1, name: s.heading, text: s.body })),
     });
   }
-  const blocks = [primary, breadcrumb];
+  const blocks: unknown[] = [primary, breadcrumb];
   if (route.faqs.length) {
     blocks.push({
       "@context": "https://schema.org",
@@ -77,65 +73,57 @@ function buildSchemas(route: RouteContent, url: string) {
   return blocks.map((b) => `<script type="application/ld+json">${JSON.stringify(b)}</script>`).join("\n    ");
 }
 
+function renderTable(t: NonNullable<RouteContent["tables"]>[number]): string {
+  const head = `<thead><tr>${t.headers.map((h) => `<th scope="col">${esc(h)}</th>`).join("")}</tr></thead>`;
+  const body = `<tbody>${t.rows.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody>`;
+  return `<figure><table><caption>${esc(t.caption)}</caption>${head}${body}</table></figure>`;
+}
+
 function renderStaticBody(route: RouteContent): string {
-  // Minimal HTML for crawlers — replaced by React on hydration.
-  const sections = route.sections
-    .map((s) => `<section><h2>${escapeHtml(s.heading)}</h2><p>${escapeHtml(s.body)}</p></section>`)
-    .join("");
+  const sections = route.sections.map((s) => `<section><h2>${esc(s.heading)}</h2><p>${esc(s.body)}</p></section>`).join("");
+  const tables = (route.tables || []).map(renderTable).join("");
   const faqs = route.faqs.length
-    ? `<section><h2>Frequently Asked Questions</h2>${route.faqs.map((f) => `<details><summary>${escapeHtml(f.q)}</summary><p>${escapeHtml(f.a)}</p></details>`).join("")}</section>`
+    ? `<section><h2>Frequently Asked Questions</h2>${route.faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("")}</section>`
     : "";
   const related = route.related.length
-    ? `<nav aria-label="Related"><h2>Related</h2><ul>${route.related.map((r) => `<li><a href="${r.href}">${escapeHtml(r.label)}</a></li>`).join("")}</ul></nav>`
+    ? `<nav aria-label="Related"><h2>Related</h2><ul>${route.related.map((r) => `<li><a href="${r.href}">${esc(r.label)}</a></li>`).join("")}</ul></nav>`
     : "";
   const outbound = route.outbound.length
-    ? `<nav aria-label="References"><ul>${route.outbound.map((o) => `<li><a href="${o.href}"${o.rel ? ` rel="${o.rel}"` : ""}${o.href.startsWith("http") ? ' target="_blank"' : ""}>${escapeHtml(o.label)}</a></li>`).join("")}</ul></nav>`
+    ? `<nav aria-label="References"><ul>${route.outbound.map((o) => `<li><a href="${o.href}"${o.rel ? ` rel="${o.rel}"` : ""}${o.href.startsWith("http") ? ' target="_blank"' : ""}>${esc(o.label)}</a></li>`).join("")}</ul></nav>`
     : "";
-  return `<main><h1>${escapeHtml(route.h1)}</h1><p>${escapeHtml(route.intro)}</p>${sections}${faqs}${related}${outbound}</main>`;
+  const aff = `<p><a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer">Try Hostinger — fast hosting from $2.99/mo</a></p>`;
+  return `<main><h1>${esc(route.h1)}</h1><p>${esc(route.intro)}</p>${sections}${tables}${faqs}${aff}${related}${outbound}</main>`;
 }
 
 function rewriteForRoute(route: RouteContent): string {
   const url = `${BASE_URL}${route.path === "/" ? "/" : route.path}`;
   let html = template;
-
-  // Replace <title>
-  html = html.replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(route.title)}</title>`);
-  // meta description
-  html = html.replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${escapeHtml(route.description)}" />`);
-  // canonical
+  html = html.replace(/<title>[^<]*<\/title>/i, `<title>${esc(route.title)}</title>`);
+  html = html.replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${esc(route.description)}" />`);
   html = html.replace(/<link rel="canonical"[^>]*>/i, `<link rel="canonical" href="${url}" />`);
-  // og:title / og:description / og:url
-  html = html.replace(/<meta property="og:title"[^>]*>/i, `<meta property="og:title" content="${escapeHtml(route.title)}" />`);
-  html = html.replace(/<meta property="og:description"[^>]*>/i, `<meta property="og:description" content="${escapeHtml(route.description)}" />`);
+  html = html.replace(/<meta property="og:title"[^>]*>/i, `<meta property="og:title" content="${esc(route.title)}" />`);
+  html = html.replace(/<meta property="og:description"[^>]*>/i, `<meta property="og:description" content="${esc(route.description)}" />`);
   html = html.replace(/<meta property="og:url"[^>]*>/i, `<meta property="og:url" content="${url}" />`);
-  html = html.replace(/<meta name="twitter:title"[^>]*>/i, `<meta name="twitter:title" content="${escapeHtml(route.title)}" />`);
-  html = html.replace(/<meta name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${escapeHtml(route.description)}" />`);
+  html = html.replace(/<meta name="twitter:title"[^>]*>/i, `<meta name="twitter:title" content="${esc(route.title)}" />`);
+  html = html.replace(/<meta name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${esc(route.description)}" />`);
 
-  // Inject per-route JSON-LD just before </head> (don't strip existing — they're sitewide schemas).
   const schemas = buildSchemas(route, url);
   html = html.replace(/<\/head>/i, `    ${schemas}\n  </head>`);
 
-  // Inject prerendered body into #root so crawlers see full content.
-  // React's hydrateRoot replaces this on the client.
-  if (route.category !== "home") {
-    const staticBody = renderStaticBody(route);
-    html = html.replace(/<div id="root"><\/div>/, `<div id="root">${staticBody}</div>`);
-  }
+  // Inject prerendered body into #root for all routes including home.
+  const staticBody = renderStaticBody(route);
+  html = html.replace(/<div id="root"><\/div>/, `<div id="root">${staticBody}</div>`);
 
   return html;
 }
 
 let written = 0;
 for (const route of ALL_ROUTES) {
-  if (route.path === "/") continue; // homepage already at dist/index.html
+  if (route.path === "/") continue;
   const outDir = resolve(DIST, route.path.replace(/^\//, ""));
   mkdirSync(outDir, { recursive: true });
-  const outPath = resolve(outDir, "index.html");
-  writeFileSync(outPath, rewriteForRoute(route), "utf8");
+  writeFileSync(resolve(outDir, "index.html"), rewriteForRoute(route), "utf8");
   written++;
 }
-
-// Also rewrite the homepage to set proper meta + schemas (overwrites the Vite default).
 writeFileSync(TEMPLATE_PATH, rewriteForRoute(ALL_ROUTES[0]), "utf8");
-
 console.log(`prerender: wrote ${written + 1} HTML files (1 home + ${written} routes)`);
