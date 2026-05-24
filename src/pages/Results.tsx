@@ -151,27 +151,42 @@ export default function Results() {
 
             {data && (
               <div className="space-y-6 sm:space-y-8">
-                <div>
-                  <SectionLabel>Overview</SectionLabel>
-                  <OverviewSection data={data} />
-                </div>
+                {!showAll && (
+                  <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+                    <span>Showing <strong className="text-foreground">{VIEW_TITLES[view]}</strong> only.</span>
+                    <Link to={`/results/${encodeURIComponent(decodedDomain)}`} className="text-primary font-semibold hover:underline">
+                      View full hosting report →
+                    </Link>
+                  </div>
+                )}
 
-                {data.whois && (
+                {showOverview && (
+                  <div>
+                    <SectionLabel>Overview</SectionLabel>
+                    <OverviewSection data={data} />
+                  </div>
+                )}
+
+                {showWhois && data.whois && (
                   <div>
                     <SectionLabel>Domain Registration (WHOIS)</SectionLabel>
                     <WhoisSection data={data} />
                   </div>
                 )}
 
-                <div>
-                  <SectionLabel>Security & Performance</SectionLabel>
-                  <SecurityPerformanceSection data={data} />
-                </div>
+                {showSecurity && (
+                  <div>
+                    <SectionLabel>Security & Performance</SectionLabel>
+                    <SecurityPerformanceSection data={data} />
+                  </div>
+                )}
 
-                <div>
-                  <SectionLabel>Technical Details</SectionLabel>
-                  <DnsRecordsSection data={data} />
-                </div>
+                {showDns && (
+                  <div>
+                    <SectionLabel>Technical Details</SectionLabel>
+                    <DnsRecordsSection data={data} />
+                  </div>
+                )}
 
                 {/* Hostinger recommendation */}
                 {showHostingerCTA ? (
@@ -204,6 +219,7 @@ export default function Results() {
                 )}
               </div>
             )}
+
           </div>
 
           {/* Sidebar ad: only on xl */}
