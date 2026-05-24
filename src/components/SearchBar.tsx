@@ -17,9 +17,11 @@ const quickDomains = ["google.com", "shopify.com", "github.com", "wordpress.com"
 interface SearchBarProps {
   defaultValue?: string;
   compact?: boolean;
+  /** Optional results view filter — appended as ?view=… so each tool shows only its slice. */
+  view?: "dns" | "whois" | "ssl" | "headers" | "ip" | "tech";
 }
 
-export function SearchBar({ defaultValue = "", compact = false }: SearchBarProps) {
+export function SearchBar({ defaultValue = "", compact = false, view }: SearchBarProps) {
   const [query, setQuery] = useState(defaultValue);
   const navigate = useNavigate();
 
@@ -27,17 +29,19 @@ export function SearchBar({ defaultValue = "", compact = false }: SearchBarProps
     setQuery(defaultValue);
   }, [defaultValue]);
 
+  const go = (domain: string) => {
+    const qs = view ? `?view=${view}` : "";
+    navigate(`/results/${encodeURIComponent(domain)}${qs}`);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const domain = extractDomain(query);
-    if (domain) {
-      navigate(`/results/${encodeURIComponent(domain)}`);
-    }
+    if (domain) go(domain);
   };
 
-  const handleQuickCheck = (domain: string) => {
-    navigate(`/results/${encodeURIComponent(domain)}`);
-  };
+  const handleQuickCheck = (domain: string) => go(domain);
+
 
   return (
     <div className="w-full max-w-2xl">

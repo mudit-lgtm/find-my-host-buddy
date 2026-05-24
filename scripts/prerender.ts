@@ -110,9 +110,12 @@ function rewriteForRoute(route: RouteContent): string {
   const schemas = buildSchemas(route, url);
   html = html.replace(/<\/head>/i, `    ${schemas}\n  </head>`);
 
-  // Inject prerendered body into #root for all routes including home.
+  // Inject prerendered body into a HIDDEN sibling div (not #root) so users
+  // never see plain-text content before React mounts, but Googlebot/ChatGPT/
+  // Perplexity still read the full semantic HTML.
   const staticBody = renderStaticBody(route);
-  html = html.replace(/<div id="root"><\/div>/, `<div id="root">${staticBody}</div>`);
+  const seoBlock = `<div id="seo-prerender" hidden aria-hidden="true">${staticBody}</div>`;
+  html = html.replace(/<div id="root"><\/div>/, `<div id="root"></div>\n    ${seoBlock}`);
 
   return html;
 }

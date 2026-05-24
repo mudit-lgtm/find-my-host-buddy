@@ -34,7 +34,26 @@ for (const r of ALL_ROUTES) {
 
   if (h1Count < 1) issues.push({ path: r.path, problem: "no <h1>" });
   if (jsonLdBlocks < 1) issues.push({ path: r.path, problem: "no JSON-LD" });
+
+  // Content-quality checks for the prerendered SEO body.
+  if (r.tables && r.tables.length > 0 && !/<table\b/i.test(html)) {
+    issues.push({ path: r.path, problem: "expected <table> not found in body" });
+  }
+  if (r.faqs.length > 0 && !/<details\b/i.test(html)) {
+    issues.push({ path: r.path, problem: "FAQ <details> not rendered" });
+  }
+  if (!/\/go\/hostinger/.test(html)) {
+    issues.push({ path: r.path, problem: "missing cloaked affiliate link (/go/hostinger)" });
+  }
+  const internalLinks = (html.match(/href="\/(tools|guides|privacy|terms|disclaimer|about|contact)(\/[^"#]*)?"/g) || []).length;
+  if (r.category !== "home" && internalLinks < 2) {
+    issues.push({ path: r.path, problem: `too few internal links (${internalLinks})` });
+  }
+  if (!/<div id="seo-prerender"/.test(html)) {
+    issues.push({ path: r.path, problem: "missing #seo-prerender wrapper" });
+  }
 }
+
 
 if (issues.length === 0) {
   console.log(`\n✅ SEO audit passed — ${ALL_ROUTES.length} routes validated\n`);

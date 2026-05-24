@@ -11,6 +11,19 @@ import { AdsterraNative } from "@/components/AdsterraNative";
 import type { RouteContent } from "@/lib/seo/keywordMap";
 import { ChevronRight } from "lucide-react";
 
+const VIEW_MAP: Record<string, "dns" | "whois" | "ssl" | "headers" | "ip" | "tech" | undefined> = {
+  DnsLookup: "dns",
+  WhoisLookup: "whois",
+  SslChecker: "ssl",
+  HttpHeaders: "headers",
+  ReverseIpLookup: "ip",
+  CmsDetector: "tech",
+  Hosting: undefined,
+};
+
+
+
+
 function renderToolWidget(kind: RouteContent["toolComponent"]) {
   switch (kind) {
     case "IsItUp":
@@ -21,20 +34,23 @@ function renderToolWidget(kind: RouteContent["toolComponent"]) {
       return <PortCheckerTool />;
     case "DomainCompare":
       return <CompareSection />;
-    default:
+    default: {
       // DnsLookup, WhoisLookup, SslChecker, HttpHeaders, ReverseIpLookup, CmsDetector,
-      // and the master Hosting checker all run through the SearchBar → /results/:domain
-      // which renders the full hosting/DNS/WHOIS/SSL/headers report.
+      // and the master Hosting checker share one search engine but each navigates
+      // to /results/:domain?view=<tool> so the results page shows only that slice.
+      const view = kind ? VIEW_MAP[kind] : undefined;
       return (
         <div className="flex flex-col items-center text-center">
-          <SearchBar />
+          <SearchBar view={view} />
           <p className="mt-3 text-xs text-muted-foreground">
             Free · No signup · Unlimited lookups
           </p>
         </div>
       );
+    }
   }
 }
+
 
 function RouteTable({ table }: { table: NonNullable<RouteContent["tables"]>[number] }) {
   return (

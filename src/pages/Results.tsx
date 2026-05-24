@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchBar } from "@/components/SearchBar";
@@ -16,6 +16,19 @@ import { AdsterraSidebar } from "@/components/AdsterraSidebar";
 import { AdsterraNative } from "@/components/AdsterraNative";
 import { StickyMobileAd } from "@/components/StickyMobileAd";
 import type { HostingResult } from "@/lib/types";
+
+type ViewKind = "dns" | "whois" | "ssl" | "headers" | "ip" | "tech" | "all";
+
+const VIEW_TITLES: Record<ViewKind, string> = {
+  dns: "DNS Records",
+  whois: "WHOIS Registration",
+  ssl: "SSL / TLS Certificate",
+  headers: "HTTP & Security Headers",
+  ip: "IP & Reverse Hosting",
+  tech: "Detected Technologies & CMS",
+  all: "Full Hosting Report",
+};
+
 
 /** Inject noindex meta and canonical pointing to / for /results/* pages. */
 function useNoIndex() {
@@ -56,6 +69,9 @@ export default function Results() {
   useNoIndex();
   const { domain } = useParams<{ domain: string }>();
   const decodedDomain = decodeURIComponent(domain || "");
+  const [params] = useSearchParams();
+  const rawView = (params.get("view") || "all").toLowerCase() as ViewKind;
+  const view: ViewKind = (["dns", "whois", "ssl", "headers", "ip", "tech", "all"] as ViewKind[]).includes(rawView) ? rawView : "all";
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["hosting", decodedDomain],
@@ -73,6 +89,12 @@ export default function Results() {
     data.securityGrade === "D" ||
     data.securityGrade === "F"
   );
+
+  const showAll = view === "all";
+  const showOverview = showAll || view === "ip";
+  const showWhois = showAll || view === "whois";
+  const showSecurity = showAll || view === "ssl" || view === "headers";
+  const showDns = showAll || view === "dns" || view === "tech";
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -92,9 +114,10 @@ export default function Results() {
                 />
               )}
               <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-                Results for <span className="text-gradient">{decodedDomain}</span>
+                {VIEW_TITLES[view]} · <span className="text-gradient">{decodedDomain}</span>
               </h1>
             </div>
+
             <div className="w-full flex justify-center">
               <SearchBar defaultValue={decodedDomain} compact />
             </div>
@@ -128,27 +151,42 @@ export default function Results() {
 
             {data && (
               <div className="space-y-6 sm:space-y-8">
-                <div>
-                  <SectionLabel>Overview</SectionLabel>
-                  <OverviewSection data={data} />
-                </div>
+                {!showAll && (
+                  <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+                    <span>Showing <strong className="text-foreground">{VIEW_TITLES[view]}</strong> only.</span>
+                    <Link to={`/results/${encodeURIComponent(decodedDomain)}`} className="text-primary font-semibold hover:underline">
+                      View full hosting report →
+                    </Link>
+                  </div>
+                )}
 
-                {data.whois && (
+                {showOverview && (
+                  <div>
+                    <SectionLabel>Overview</SectionLabel>
+                    <OverviewSection data={data} />
+                  </div>
+                )}
+
+                {showWhois && data.whois && (
                   <div>
                     <SectionLabel>Domain Registration (WHOIS)</SectionLabel>
                     <WhoisSection data={data} />
                   </div>
                 )}
 
-                <div>
-                  <SectionLabel>Security & Performance</SectionLabel>
-                  <SecurityPerformanceSection data={data} />
-                </div>
+                {showSecurity && (
+                  <div>
+                    <SectionLabel>Security & Performance</SectionLabel>
+                    <SecurityPerformanceSection data={data} />
+                  </div>
+                )}
 
-                <div>
-                  <SectionLabel>Technical Details</SectionLabel>
-                  <DnsRecordsSection data={data} />
-                </div>
+                {showDns && (
+                  <div>
+                    <SectionLabel>Technical Details</SectionLabel>
+                    <DnsRecordsSection data={data} />
+                  </div>
+                )}
 
                 {/* Hostinger recommendation */}
                 {showHostingerCTA ? (
@@ -181,6 +219,7 @@ export default function Results() {
                 )}
               </div>
             )}
+
           </div>
 
           {/* Sidebar ad: only on xl */}
