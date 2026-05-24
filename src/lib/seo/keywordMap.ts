@@ -15,6 +15,22 @@ export interface RouteTable {
   rows: string[][];
 }
 
+export interface RichSection {
+  heading: string;
+  body: string;
+  bullets?: string[];
+}
+
+export interface UseCase {
+  title: string;
+  body: string;
+}
+
+export interface Troubleshoot {
+  problem: string;
+  solution: string;
+}
+
 export interface RouteContent {
   path: string;
   title: string;          // <60c
@@ -22,8 +38,18 @@ export interface RouteContent {
   h1: string;
   intro: string;          // AEO 40-60w intro paragraph
   keywords: string[];
-  sections: { heading: string; body: string }[];
+  /** Snippet-ready 1-2 sentence direct answer for AEO (lifted by ChatGPT/Perplexity/Google snippet). */
+  quickAnswer?: string;
+  /** Single line GEO note (worldwide + US emphasis). */
+  geoNote?: string;
+  /** Scannable bullets summarising what the page covers. */
+  keyPoints?: string[];
+  sections: RichSection[];
   tables?: RouteTable[];
+  /** Long-form real-world scenarios. */
+  useCases?: UseCase[];
+  /** Common problems + fixes. */
+  troubleshooting?: Troubleshoot[];
   faqs: FAQ[];
   related: { label: string; href: string }[];
   outbound: { label: string; href: string; rel?: string }[];
@@ -573,6 +599,43 @@ export const TOOL_ROUTES: RouteContent[] = [
     toolComponent: "DomainCompare",
   },
 ];
+
+// ---------- Overlay rich AEO/GEO content from toolContent.json -----------
+// Each tool gets: quickAnswer, geoNote, keyPoints, expanded sections w/ bullets,
+// useCases, troubleshooting, and 10+ FAQs (1500-2300 body words per page).
+import toolContentRaw from "./toolContent.json";
+type ToolContent = {
+  quickAnswer: string;
+  geoNote: string;
+  keyPoints: string[];
+  sections: RichSection[];
+  useCases: UseCase[];
+  troubleshooting: Troubleshoot[];
+  faqs: FAQ[];
+};
+const toolContent = toolContentRaw as Record<string, ToolContent>;
+const slugFromPath = (p: string) => p.replace(/^\/tools\//, "");
+
+for (const route of TOOL_ROUTES) {
+  const rich = toolContent[slugFromPath(route.path)];
+  if (!rich) continue;
+  route.quickAnswer = rich.quickAnswer;
+  route.geoNote = rich.geoNote;
+  route.keyPoints = rich.keyPoints;
+  route.sections = rich.sections;        // replace with the 7-9 rich sections
+  route.useCases = rich.useCases;
+  route.troubleshooting = rich.troubleshooting;
+  // Merge FAQs: keep originals first, append AI-generated, dedupe by question.
+  const seen = new Set(route.faqs.map((f) => f.q.toLowerCase()));
+  for (const f of rich.faqs) {
+    if (!seen.has(f.q.toLowerCase())) {
+      route.faqs.push(f);
+      seen.add(f.q.toLowerCase());
+    }
+  }
+}
+
+
 
 // ---------- GUIDES ----------
 

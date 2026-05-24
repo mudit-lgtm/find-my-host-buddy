@@ -80,7 +80,25 @@ function renderTable(t: NonNullable<RouteContent["tables"]>[number]): string {
 }
 
 function renderStaticBody(route: RouteContent): string {
-  const sections = route.sections.map((s) => `<section><h2>${esc(s.heading)}</h2><p>${esc(s.body)}</p></section>`).join("");
+  const sections = route.sections.map((s) => {
+    const bullets = s.bullets && s.bullets.length
+      ? `<ul>${s.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>`
+      : "";
+    return `<section><h2>${esc(s.heading)}</h2><p>${esc(s.body)}</p>${bullets}</section>`;
+  }).join("");
+  const quickAnswer = route.quickAnswer
+    ? `<aside id="quick-answer"><p><strong>Quick answer:</strong> ${esc(route.quickAnswer)}</p></aside>`
+    : "";
+  const geo = route.geoNote ? `<p><em>${esc(route.geoNote)}</em></p>` : "";
+  const keyPoints = route.keyPoints && route.keyPoints.length
+    ? `<section aria-label="What this page covers"><h2>What this page covers</h2><ul>${route.keyPoints.map((k) => `<li>${esc(k)}</li>`).join("")}</ul></section>`
+    : "";
+  const useCases = route.useCases && route.useCases.length
+    ? `<section><h2>Real-world use cases</h2>${route.useCases.map((u) => `<article><h3>${esc(u.title)}</h3><p>${esc(u.body)}</p></article>`).join("")}</section>`
+    : "";
+  const trouble = route.troubleshooting && route.troubleshooting.length
+    ? `<section><h2>Troubleshooting</h2><dl>${route.troubleshooting.map((t) => `<dt>${esc(t.problem)}</dt><dd>${esc(t.solution)}</dd>`).join("")}</dl></section>`
+    : "";
   const tables = (route.tables || []).map(renderTable).join("");
   const faqs = route.faqs.length
     ? `<section><h2>Frequently Asked Questions</h2>${route.faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("")}</section>`
@@ -92,7 +110,7 @@ function renderStaticBody(route: RouteContent): string {
     ? `<nav aria-label="References"><ul>${route.outbound.map((o) => `<li><a href="${o.href}"${o.rel ? ` rel="${o.rel}"` : ""}${o.href.startsWith("http") ? ' target="_blank"' : ""}>${esc(o.label)}</a></li>`).join("")}</ul></nav>`
     : "";
   const aff = `<p><a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer">Try Hostinger — fast hosting from $2.99/mo</a></p>`;
-  return `<main><h1>${esc(route.h1)}</h1><p>${esc(route.intro)}</p>${sections}${tables}${faqs}${aff}${related}${outbound}</main>`;
+  return `<main><h1>${esc(route.h1)}</h1><p>${esc(route.intro)}</p>${quickAnswer}${geo}${keyPoints}${sections}${tables}${useCases}${trouble}${faqs}${aff}${related}${outbound}</main>`;
 }
 
 function rewriteForRoute(route: RouteContent): string {

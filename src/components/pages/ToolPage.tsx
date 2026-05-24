@@ -81,8 +81,10 @@ function RouteTable({ table }: { table: NonNullable<RouteContent["tables"]>[numb
 }
 
 export default function ToolPage({ route }: { route: RouteContent }) {
-  // Mobile-AEO helper: surface the first 3 FAQ questions as quick-scan bullets.
-  const keyPoints = route.faqs.slice(0, 3).map((f) => f.q);
+  // Prefer explicit AEO keyPoints from rich content; fallback to first FAQs.
+  const keyPoints = route.keyPoints && route.keyPoints.length > 0
+    ? route.keyPoints
+    : route.faqs.slice(0, 4).map((f) => f.q);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -108,12 +110,28 @@ export default function ToolPage({ route }: { route: RouteContent }) {
             {route.intro}
           </p>
 
+          {/* AEO quick-answer block — Google/ChatGPT/Perplexity snippet target */}
+          {route.quickAnswer && (
+            <div
+              id="quick-answer"
+              className="mt-5 mx-auto max-w-2xl rounded-xl border-l-4 border-primary bg-primary/5 p-4 text-sm sm:text-base text-foreground"
+            >
+              <p className="font-display font-semibold uppercase tracking-wide text-xs text-primary mb-1">Quick answer</p>
+              <p className="leading-relaxed">{route.quickAnswer}</p>
+            </div>
+          )}
+
+          {/* GEO note */}
+          {route.geoNote && (
+            <p className="mt-3 text-center text-xs text-muted-foreground italic">🌐 {route.geoNote}</p>
+          )}
+
           {keyPoints.length > 0 && (
             <aside
-              aria-label="Quick answers"
+              aria-label="What you'll learn"
               className="mt-5 mx-auto max-w-2xl rounded-xl border bg-muted/30 p-4 text-sm"
             >
-              <p className="font-display font-semibold text-foreground mb-2">In short</p>
+              <p className="font-display font-semibold text-foreground mb-2">What this page covers</p>
               <ul className="space-y-1.5 text-muted-foreground">
                 {keyPoints.map((q) => (
                   <li key={q} className="flex gap-2">
@@ -134,9 +152,9 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           <AdsterraNative />
         </div>
 
-        <section className="container max-w-3xl mx-auto px-4 py-8 space-y-6">
+        <section className="container max-w-3xl mx-auto px-4 py-8 space-y-8">
           {route.sections.map((s) => {
-            // Split on sentence end for scannable mobile paragraphs (1–2 sentences each).
+            // Split sentences into 1-2 sentence paragraphs for mobile scanning.
             const sentences = s.body.match(/[^.!?]+[.!?]+(\s|$)/g)?.map((x) => x.trim()).filter(Boolean) || [s.body];
             const chunks: string[] = [];
             for (let i = 0; i < sentences.length; i += 2) {
@@ -144,14 +162,54 @@ export default function ToolPage({ route }: { route: RouteContent }) {
             }
             return (
               <article key={s.heading}>
-                <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-3">{s.heading}</h2>
+                <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-3 text-foreground">{s.heading}</h2>
                 {chunks.map((c, i) => (
-                  <p key={i} className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3 last:mb-0">{c}</p>
+                  <p key={i} className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{c}</p>
                 ))}
+                {s.bullets && s.bullets.length > 0 && (
+                  <ul className="mt-2 space-y-1.5 text-sm sm:text-base text-muted-foreground">
+                    {s.bullets.map((b, i) => (
+                      <li key={i} className="flex gap-2 pl-1">
+                        <span aria-hidden className="text-primary mt-1">•</span>
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </article>
             );
           })}
+
           {route.tables?.map((t) => <RouteTable key={t.caption} table={t} />)}
+
+          {route.useCases && route.useCases.length > 0 && (
+            <article>
+              <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-4">Real-world use cases</h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {route.useCases.map((u) => (
+                  <div key={u.title} className="rounded-lg border bg-card p-4">
+                    <h3 className="font-display font-semibold text-foreground text-sm sm:text-base mb-2">{u.title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{u.body}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          )}
+
+          {route.troubleshooting && route.troubleshooting.length > 0 && (
+            <article>
+              <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-4">Troubleshooting</h2>
+              <div className="space-y-3">
+                {route.troubleshooting.map((t) => (
+                  <div key={t.problem} className="rounded-lg border-l-4 border-orange-400 bg-orange-50/40 dark:bg-orange-950/10 p-3 sm:p-4">
+                    <p className="font-display font-semibold text-foreground text-sm mb-1">{t.problem}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{t.solution}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          )}
+
           <p className="text-sm text-muted-foreground border-l-2 border-primary/40 pl-3 italic">
             Need faster, more affordable hosting? <a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer" className="text-primary font-semibold hover:underline">Try Hostinger from $2.99/month →</a>
           </p>
@@ -160,12 +218,12 @@ export default function ToolPage({ route }: { route: RouteContent }) {
         {route.faqs.length > 0 && (
           <section className="container max-w-3xl mx-auto px-4 py-10 border-t">
             <h2 className="font-display text-2xl font-bold mb-6">Frequently Asked Questions</h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {route.faqs.map((f) => (
                 <details key={f.q} className="group rounded-lg border bg-card p-4">
-                  <summary className="cursor-pointer font-semibold text-foreground list-none flex justify-between items-center">
-                    {f.q}
-                    <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                  <summary className="cursor-pointer font-semibold text-foreground list-none flex justify-between items-start gap-3 text-sm sm:text-base">
+                    <span>{f.q}</span>
+                    <ChevronRight className="h-4 w-4 mt-1 shrink-0 transition-transform group-open:rotate-90" />
                   </summary>
                   <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{f.a}</p>
                 </details>
