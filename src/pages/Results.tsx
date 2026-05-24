@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchBar } from "@/components/SearchBar";
@@ -16,6 +16,19 @@ import { AdsterraSidebar } from "@/components/AdsterraSidebar";
 import { AdsterraNative } from "@/components/AdsterraNative";
 import { StickyMobileAd } from "@/components/StickyMobileAd";
 import type { HostingResult } from "@/lib/types";
+
+type ViewKind = "dns" | "whois" | "ssl" | "headers" | "ip" | "tech" | "all";
+
+const VIEW_TITLES: Record<ViewKind, string> = {
+  dns: "DNS Records",
+  whois: "WHOIS Registration",
+  ssl: "SSL / TLS Certificate",
+  headers: "HTTP & Security Headers",
+  ip: "IP & Reverse Hosting",
+  tech: "Detected Technologies & CMS",
+  all: "Full Hosting Report",
+};
+
 
 /** Inject noindex meta and canonical pointing to / for /results/* pages. */
 function useNoIndex() {
