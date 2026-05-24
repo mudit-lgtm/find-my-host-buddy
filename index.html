@@ -128,6 +128,22 @@
     }
     </script>
 
+    <!-- JSON-LD: WebSite + SearchAction -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Site Host Finder",
+      "url": "https://site-host-finder.vercel.app/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://site-host-finder.vercel.app/results/{search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+
     <!-- JSON-LD: FAQPage -->
     <script type="application/ld+json">
     {

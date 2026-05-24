@@ -9,7 +9,8 @@ import { CompareSection } from "@/components/CompareSection";
 import { StickyMobileAd } from "@/components/StickyMobileAd";
 import { AdsterraNative } from "@/components/AdsterraNative";
 import type { RouteContent } from "@/lib/seo/keywordMap";
-import { ChevronRight } from "lucide-react";
+import { highlightKeywords } from "@/lib/seo/highlightKeywords";
+import { ChevronRight, Sparkles } from "lucide-react";
 
 const VIEW_MAP: Record<string, "dns" | "whois" | "ssl" | "headers" | "ip" | "tech" | undefined> = {
   DnsLookup: "dns",
@@ -20,9 +21,6 @@ const VIEW_MAP: Record<string, "dns" | "whois" | "ssl" | "headers" | "ip" | "tec
   CmsDetector: "tech",
   Hosting: undefined,
 };
-
-
-
 
 function renderToolWidget(kind: RouteContent["toolComponent"]) {
   switch (kind) {
@@ -35,9 +33,6 @@ function renderToolWidget(kind: RouteContent["toolComponent"]) {
     case "DomainCompare":
       return <CompareSection />;
     default: {
-      // DnsLookup, WhoisLookup, SslChecker, HttpHeaders, ReverseIpLookup, CmsDetector,
-      // and the master Hosting checker share one search engine but each navigates
-      // to /results/:domain?view=<tool> so the results page shows only that slice.
       const view = kind ? VIEW_MAP[kind] : undefined;
       return (
         <div className="flex flex-col items-center text-center">
@@ -50,7 +45,6 @@ function renderToolWidget(kind: RouteContent["toolComponent"]) {
     }
   }
 }
-
 
 function RouteTable({ table }: { table: NonNullable<RouteContent["tables"]>[number] }) {
   return (
@@ -81,10 +75,12 @@ function RouteTable({ table }: { table: NonNullable<RouteContent["tables"]>[numb
 }
 
 export default function ToolPage({ route }: { route: RouteContent }) {
-  // Prefer explicit AEO keyPoints from rich content; fallback to first FAQs.
   const keyPoints = route.keyPoints && route.keyPoints.length > 0
     ? route.keyPoints
     : route.faqs.slice(0, 4).map((f) => f.q);
+
+  // Short 1-line description for the hero (first sentence of intro).
+  const heroDescription = route.intro.match(/^[^.!?]+[.!?]/)?.[0] || route.intro;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -92,6 +88,7 @@ export default function ToolPage({ route }: { route: RouteContent }) {
       <Header />
 
       <main className="flex-1">
+        {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="container max-w-5xl mx-auto px-4 pt-4 text-xs text-muted-foreground">
           <ol className="flex items-center gap-1 flex-wrap">
             <li><a href="/" className="hover:text-foreground">Home</a></li>
@@ -102,59 +99,68 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           </ol>
         </nav>
 
-        <section className="container max-w-3xl mx-auto px-4 py-8 md:py-12">
+        {/* HERO — H1 + 1-line desc + TOOL (tool is the focal point) */}
+        <section className="container max-w-3xl mx-auto px-4 pt-6 pb-8 md:pt-10 md:pb-10">
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-center">
             {route.h1}
           </h1>
           <p className="mt-3 text-sm sm:text-base md:text-lg text-muted-foreground text-center max-w-2xl mx-auto leading-relaxed">
-            {route.intro}
+            {heroDescription}
           </p>
 
-          {/* AEO quick-answer block — Google/ChatGPT/Perplexity snippet target */}
+          {/* THE TOOL — prominent card */}
+          <div className="mt-6 md:mt-8 rounded-2xl border-2 border-primary/20 bg-card p-5 sm:p-6 md:p-8 shadow-lg shadow-primary/5">
+            {renderToolWidget(route.toolComponent)}
+          </div>
+
+          {/* AEO quick-answer chip — directly below the tool */}
           {route.quickAnswer && (
             <div
               id="quick-answer"
-              className="mt-5 mx-auto max-w-2xl rounded-xl border-l-4 border-primary bg-primary/5 p-4 text-sm sm:text-base text-foreground"
+              className="mt-4 mx-auto max-w-2xl rounded-lg bg-primary/5 border border-primary/20 px-4 py-3 text-sm flex gap-3 items-start"
             >
-              <p className="font-display font-semibold uppercase tracking-wide text-xs text-primary mb-1">Quick answer</p>
-              <p className="leading-relaxed">{route.quickAnswer}</p>
+              <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+              <p className="leading-relaxed text-foreground">
+                <span className="font-semibold text-primary">Quick answer: </span>
+                {highlightKeywords(route.quickAnswer, route.keywords)}
+              </p>
             </div>
           )}
 
-          {/* GEO note */}
           {route.geoNote && (
-            <p className="mt-3 text-center text-xs text-muted-foreground italic">🌐 {route.geoNote}</p>
+            <p className="mt-2 text-center text-xs text-muted-foreground italic">🌐 {route.geoNote}</p>
           )}
-
-          {keyPoints.length > 0 && (
-            <aside
-              aria-label="What you'll learn"
-              className="mt-5 mx-auto max-w-2xl rounded-xl border bg-muted/30 p-4 text-sm"
-            >
-              <p className="font-display font-semibold text-foreground mb-2">What this page covers</p>
-              <ul className="space-y-1.5 text-muted-foreground">
-                {keyPoints.map((q) => (
-                  <li key={q} className="flex gap-2">
-                    <span aria-hidden className="text-primary mt-0.5">›</span>
-                    <span>{q}</span>
-                  </li>
-                ))}
-              </ul>
-            </aside>
-          )}
-
-          <div className="mt-6 rounded-2xl border bg-card p-4 sm:p-5 md:p-6 shadow-sm">
-            {renderToolWidget(route.toolComponent)}
-          </div>
         </section>
 
         <div className="container max-w-3xl mx-auto px-4">
           <AdsterraNative />
         </div>
 
-        <section className="container max-w-3xl mx-auto px-4 py-8 space-y-8">
+        {/* KEY POINTS — what the page covers */}
+        {keyPoints.length > 0 && (
+          <section className="container max-w-3xl mx-auto px-4 py-6">
+            <aside
+              aria-label="What this page covers"
+              className="rounded-xl border bg-muted/30 p-4 sm:p-5"
+            >
+              <p className="font-display font-semibold text-foreground text-sm sm:text-base mb-3">
+                What this page covers
+              </p>
+              <ul className="grid sm:grid-cols-2 gap-2 text-sm font-medium text-foreground/90">
+                {keyPoints.map((q) => (
+                  <li key={q} className="flex gap-2">
+                    <span aria-hidden className="text-primary mt-0.5 font-bold">›</span>
+                    <span>{q}</span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          </section>
+        )}
+
+        {/* LONG-FORM CONTENT */}
+        <section className="container max-w-3xl mx-auto px-4 py-8 space-y-10">
           {route.sections.map((s) => {
-            // Split sentences into 1-2 sentence paragraphs for mobile scanning.
             const sentences = s.body.match(/[^.!?]+[.!?]+(\s|$)/g)?.map((x) => x.trim()).filter(Boolean) || [s.body];
             const chunks: string[] = [];
             for (let i = 0; i < sentences.length; i += 2) {
@@ -162,16 +168,20 @@ export default function ToolPage({ route }: { route: RouteContent }) {
             }
             return (
               <article key={s.heading}>
-                <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-3 text-foreground">{s.heading}</h2>
+                <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-3 text-foreground border-b-2 border-primary/30 pb-2 inline-block">
+                  {s.heading}
+                </h2>
                 {chunks.map((c, i) => (
-                  <p key={i} className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{c}</p>
+                  <p key={i} className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">
+                    {highlightKeywords(c, route.keywords)}
+                  </p>
                 ))}
                 {s.bullets && s.bullets.length > 0 && (
-                  <ul className="mt-2 space-y-1.5 text-sm sm:text-base text-muted-foreground">
+                  <ul className="mt-3 space-y-2 text-sm sm:text-base text-foreground/90">
                     {s.bullets.map((b, i) => (
                       <li key={i} className="flex gap-2 pl-1">
-                        <span aria-hidden className="text-primary mt-1">•</span>
-                        <span>{b}</span>
+                        <span aria-hidden className="text-primary mt-1 font-bold">•</span>
+                        <span>{highlightKeywords(b, route.keywords)}</span>
                       </li>
                     ))}
                   </ul>
@@ -184,10 +194,12 @@ export default function ToolPage({ route }: { route: RouteContent }) {
 
           {route.useCases && route.useCases.length > 0 && (
             <article>
-              <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-4">Real-world use cases</h2>
+              <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-4 border-b-2 border-primary/30 pb-2 inline-block">
+                Real-world use cases
+              </h2>
               <div className="grid gap-3 sm:grid-cols-2">
                 {route.useCases.map((u) => (
-                  <div key={u.title} className="rounded-lg border bg-card p-4">
+                  <div key={u.title} className="rounded-lg border bg-card p-4 hover:border-primary/40 transition">
                     <h3 className="font-display font-semibold text-foreground text-sm sm:text-base mb-2">{u.title}</h3>
                     <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{u.body}</p>
                   </div>
@@ -198,7 +210,9 @@ export default function ToolPage({ route }: { route: RouteContent }) {
 
           {route.troubleshooting && route.troubleshooting.length > 0 && (
             <article>
-              <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-4">Troubleshooting</h2>
+              <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-4 border-b-2 border-primary/30 pb-2 inline-block">
+                Troubleshooting
+              </h2>
               <div className="space-y-3">
                 {route.troubleshooting.map((t) => (
                   <div key={t.problem} className="rounded-lg border-l-4 border-orange-400 bg-orange-50/40 dark:bg-orange-950/10 p-3 sm:p-4">

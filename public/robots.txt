@@ -1,10 +1,21 @@
 User-agent: Googlebot
 Allow: /
+Allow: /tools/
+Allow: /guides/
+Allow: /privacy
+Allow: /terms
+Allow: /disclaimer
+Allow: /about
+Allow: /contact
 Disallow: /results/
+Disallow: /go/
 
 User-agent: Bingbot
 Allow: /
+Allow: /tools/
+Allow: /guides/
 Disallow: /results/
+Disallow: /go/
 
 User-agent: Twitterbot
 Allow: /
@@ -14,6 +25,8 @@ Allow: /
 
 User-agent: *
 Allow: /
+Allow: /tools/
+Allow: /guides/
 Disallow: /results/
 Disallow: /go/
 

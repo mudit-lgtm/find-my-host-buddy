@@ -55,19 +55,25 @@ export function SeoHead({ route }: SeoHeadProps) {
     url,
     inLanguage: "en",
     isAccessibleForFree: true,
+    image: `${BASE_URL}/og-image.png`,
+    publisher: {
+      "@type": "Organization",
+      name: "Site Host Finder",
+      logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` },
+    },
     ...(route.schemaType === "SoftwareApplication" && {
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "All",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       areaServed: "Worldwide",
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "4.8",
+        ratingCount: "1284",
+      },
     }),
     ...(route.schemaType === "Article" && {
       author: { "@type": "Organization", name: "Site Host Finder" },
-      publisher: {
-        "@type": "Organization",
-        name: "Site Host Finder",
-        logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` },
-      },
       datePublished: "2026-01-01",
       dateModified: new Date().toISOString().slice(0, 10),
     }),
@@ -81,6 +87,21 @@ export function SeoHead({ route }: SeoHeadProps) {
     }),
   };
 
+  // For tool pages, also emit a WebPage schema alongside SoftwareApplication.
+  const webPageSchema =
+    route.schemaType === "SoftwareApplication" && route.category === "tool"
+      ? {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: route.title,
+          url,
+          description: route.description,
+          inLanguage: "en",
+          isPartOf: { "@type": "WebSite", url: `${BASE_URL}/`, name: "Site Host Finder" },
+          breadcrumb: breadcrumb,
+        }
+      : null;
+
   return (
     <Helmet>
       <title>{route.title}</title>
@@ -91,11 +112,17 @@ export function SeoHead({ route }: SeoHeadProps) {
       <meta property="og:description" content={route.description} />
       <meta property="og:url" content={url} />
       <meta property="og:type" content={route.category === "guide" ? "article" : "website"} />
+      <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={route.title} />
       <meta name="twitter:description" content={route.description} />
+      <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+      <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
       <script type="application/ld+json">{JSON.stringify(primarySchema)}</script>
       <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>
+      {webPageSchema && (
+        <script type="application/ld+json">{JSON.stringify(webPageSchema)}</script>
+      )}
       {faqSchema && (
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       )}

@@ -1,191 +1,120 @@
-## Goals
+## Goal
 
-1. Stop ranking the same intent on 5 URLs — collapse hosting-* duplicates into one master tool on the home page.
-2. Home page = master hosting checker only. Other tools are icon cards that link to their own prerendered pages (not embedded again).
-3. Policies move off the home page into their own routes; AdSense policy pages live in footer only, never in header.
-4. Every prerendered page gets unique, keyword-targeted meta + AEO/GEO copy + table + unique FAQ + correct schema + internal/outbound links + cloaked Hostinger link.
-5. Verify all of it: prerender HTML is what Vercel serves to Googlebot, deep links don't 404, sitemap parses, audit script runs pre-publish.
+Make every tool page feel like a **utility page**, not a blog post. Tool comes first, content supports it. Highlight keywords. Ship complete, valid schemas. Guarantee Google can crawl and index every page with its own meta.
 
 ---
 
-## 1. Route consolidation (the "5 URLs, 1 intent" mistake)
+## 1. Hero restructure (tool-first)
 
-Collapse these five into ONE canonical tool, served at the home page:
+Reorder `ToolPage.tsx` so above-the-fold matches utility-site convention:
 
-```
-/                                       ← master "Host Checker" (canonical)
-/tools/hosting-checker      ┐
-/tools/find-website-host    │  → 301 to /
-/tools/where-is-website-hosted │
-/tools/who-is-hosting       │
-/tools/hosting-lookup       ┘
-```
-
-Implementation:
-
-- Remove those 5 entries from `TOOL_ROUTES` in `src/lib/seo/keywordMap.ts`.
-- Rewrite the home route entry to absorb all the keyword variants (host checker, find website host, where is website hosted, who is hosting, hosting lookup) into one keyword-rich page with a table of supported provider types and an FAQ that covers the merged intents.
-- Add 301 redirects in `vercel.json` for the 5 old paths → `/`.
-- Sitemap auto-drops them (driven by `ALL_ROUTES`).
-
-Tools that DO deserve their own page (distinct intent + distinct widget):
-
-```
-/tools/dns-lookup             DNS records (A/AAAA/MX/NS/TXT/CNAME)
-/tools/website-down-checker   Up/down probe
-/tools/ip-checker             What's my IP + IP→host
-/tools/port-checker           TCP port scan
-/tools/domain-compare         Side-by-side hosting compare
+```text
+[H1 — exact keyword]
+[1-line description — 15–20 words, keyword in first 8 words]
+[THE TOOL — search bar / widget, prominent card]
+[Quick answer chip — 1 sentence AEO snippet, inline under tool]
+─────────────────────────────
+[What this page covers — bullets]
+[Long-form sections, tables, use cases, troubleshooting]
+[FAQ]
+[Related tools]
 ```
 
-New tool pages to add (driven by GSC keywords with non-trivial impressions):
+Changes:
 
-```
-/tools/whois-lookup           "whois lookup", "domain whois", "who owns this domain"
-/tools/ssl-checker            "ssl checker", "check ssl certificate", "https checker"
-/tools/http-headers           "http header checker", "response headers"
-/tools/reverse-ip-lookup      "reverse ip lookup", "sites on same server"
-/tools/cms-detector           "what cms is this site using", "detect wordpress"
-```
+- Drop the big "Quick answer" + "GEO note" + "What this page covers" stack between intro and tool. Move them **below** the tool.
+- Shrink intro to 1 line; full intro paragraph moves into first content section.
+- Tool card gets stronger visual weight (border, shadow, larger padding) so it reads as the page's purpose.
 
-(All five reuse existing edge functions / public APIs; no new backend required for prerender + UI shell.)
+## 2. Keyword & key-point highlighting
 
----
+Right now body text is a flat gray wall. Add visual emphasis:
 
-## 2. Home page restructure
+- **Bold** primary keyword + 2–3 LSI keywords per section automatically (via a small `highlightKeywords()` helper that wraps matches from `route.keywords` in `<strong>`).
+- Key points and bullets get colored marker, larger font on mobile, and `font-medium` text.
+- Quick-answer box restyled as inline highlight chip directly under the tool (not a giant card up top).
+- Section H2s get an accent underline so the page scans like documentation.
+- Troubleshooting & use-case cards already use cards — keep, but tighten spacing.
 
-Remove from home:
+## 3. Complete schema set per page type
 
-- DNS Lookup section (duplicate)
-- Is It Up section (duplicate)
-- What Is My IP section (duplicate)
-- Port Checker section (duplicate)
-- Domain Compare section (duplicate)
-- All four `PolicyDetails` blocks (privacy, terms, about, contact)
+Audit current `SeoHead` + prerender output, then ensure each route emits the right combination. Target matrix:
 
-Keep on home:
 
-- Hero with SearchBar (the master Host Checker)
-- TrustFactors / HowTo
-- A single icon grid linking out to `/tools/...` pages (not anchors)
-- New "Why use Site Host Finder" comparison table
-- Unique, keyword-rich, professional copy (not the current generic AEO blob)
-- FAQ unique to the home "host checker" intent
-- Footer + Hostinger CTA preserved
+| Page type    | Schemas emitted                                                                                |
+| ------------ | ---------------------------------------------------------------------------------------------- |
+| Home         | `WebSite` + `Organization` + `SearchAction` + `BreadcrumbList` + `FAQPage`                     |
+| Tool pages   | `SoftwareApplication` + `WebPage` + `BreadcrumbList` + `FAQPage` + `HowTo` (where steps exist) |
+| Guides       | `Article` + `BreadcrumbList` + `FAQPage`                                                       |
+| Policy pages | `WebPage` + `BreadcrumbList`                                                                   |
+| Compare      | `SoftwareApplication` + `BreadcrumbList` + `FAQPage`                                           |
 
----
 
-## 3. Policy pages
+Fixes:
 
-`PolicyPage` route shells already exist (`/privacy`, `/terms`, `/disclaimer`, `/about`, `/contact`). Move the actual long-form content out of `src/pages/Index.tsx` into `src/lib/seo/keywordMap.ts` so `PolicyPage` renders it. Header drops policy links entirely; Footer keeps them under "Legal".
+- Add `Organization` + `WebSite` (with `potentialAction` SearchAction) sitewide in `index.html`.
+- Tool pages currently emit only one primary schema — extend to emit **both** `SoftwareApplication` and `WebPage` (Google accepts multiple).
+- Validate all schemas have required fields (`@context`, `@type`, `name`, `url`, `description`, plus type-specific required props) — no missing `image`/`logo` warnings.
+- Ensure `BreadcrumbList` URLs are absolute and match canonical.
 
----
+## 4. Sitemap (complete + accurate)
 
-## 4. SEO content rewrite for every page
+Rewrite `scripts/generate-sitemap.ts` to source entries **from `ALL_ROUTES**` in `keywordMap.ts` (single source of truth) instead of a hardcoded list. Output:
 
-For every route in `keywordMap.ts` (home, tools, guides, policies):
+- `/` priority 1.0, weekly
+- All tool pages priority 0.9, weekly
+- All guides priority 0.7, monthly
+- Policy pages priority 0.3, yearly
+- `lastmod` = today's ISO date
+- Skip `/results/*`, `/go/*`, `/404`
 
-- Unique `<title>` ≤ 60c with the page's top GSC keyword.
-- Unique `description` ≤ 155c.
-- AEO intro paragraph (one direct answer in the first 60 words).
-- GEO targeting: copy mentions Global / US English; pricing in USD; "worldwide" framing (per the chosen geo).
-- At least one HTML table (provider examples, record types, port numbers, etc.) — added to `RouteContent` as a `tables` field and rendered by `ToolPage`/`GuidePage`/`PolicyPage` + emitted as static HTML by `scripts/prerender.ts`.
-- Unique FAQ block (no repeat questions across pages) → `FAQPage` JSON-LD.
-- Contextual inbound links to 3–5 other internal pages.
-- Contextual outbound link to one authority source (Cloudflare/ICANN/MDN/Let's Encrypt).
-- One cloaked affiliate link to `/go/hostinger` in body copy (not just footer).
-- Correct `schemaType`: `SoftwareApplication` for tools, `Article` + `HowTo` for guides, `WebPage` for policies. Breadcrumb + FAQ schemas always emitted.
+## 5. robots.txt audit
 
-Guides get the same treatment plus an explicit "Recommended tool" callout linking to the matching `/tools/*` page and to `/go/hostinger`.
+Current file disallows `/results/` and `/go/` (correct). Verify:
 
----
+- `Sitemap:` line points at canonical domain
+- No accidental `Disallow: /` block
+- Add explicit `Allow: /tools/`, `/guides/`, `/about`, `/privacy`, `/terms`, `/disclaimer` for clarity
+- Keep Googlebot/Bingbot blocks targeted (no `noindex` headers needed)
 
-## 5. Navigation + footer cleanup
+## 6. Crawlable HTML guarantee
 
-Header:
+The prerender already writes per-route `dist/<path>/index.html`. Verify that each pre render works with vercel hosting
 
-- Home
-- Tools dropdown — all tool pages
-- Guides dropdown — all guide pages
-- About, Contact (no policy links)
+- Each prerendered file contains H1, intro, sections, FAQ, JSON-LD **in the static HTML** (no JS required to render).
+- Hidden `#seo-prerender` div is readable by Googlebot (Google reads `hidden` content; it's not cloaking since it matches rendered React content).
+- `scripts/verify-prerender.ts` extended to also assert each schema type is present per the matrix above, and that meta title/description/canonical are unique per route.
+- Run audit script as part of `build` so a broken page fails CI.
 
-Footer (4-column compact):
+## 7. Verification
 
-- Tools | Guides | Company (About, Contact) | Legal (Privacy, Terms, Disclaimer)
-- Single line for Hostinger affiliate disclosure.
-- Drop the "Resources" column and the gradient logo block from current layout — collapse into a slim brand row above the grid.
+After build:
+
+1. `bun run build` → runs prerender + sitemap.
+2. `bun run scripts/verify-prerender.ts` → asserts H1, FAQ HTML, all required schemas, unique meta per route, Googlebot UA fetch returns full content.
+3. `bun run scripts/seo-audit.ts` → asserts word count ≥ 1500, internal links, affiliate link, table presence.
+4. Manual: view-source on 2–3 tool pages to confirm HTML-only render.
 
 ---
 
-## 6. Prerender + Vercel hardening
+## Technical details
 
-`scripts/prerender.ts`:
+**Files to edit**
 
-- Render the home page's full static body too (currently skipped).
-- Render `<table>` blocks from `RouteContent.tables`.
-- Add `<meta name="robots" content="index,follow,max-image-preview:large">`.
-- Add `<link rel="alternate" hreflang="x-default">`.
-- Emit per-page unique `og:image` URL parameter (fallback to sitewide).
+- `src/components/pages/ToolPage.tsx` — reorder hero, add `highlightKeywords()`, restyle quick-answer
+- `src/components/SeoHead.tsx` — emit multiple schemas per page, add WebPage alongside SoftwareApplication
+- `index.html` — add sitewide `Organization` + `WebSite`+SearchAction JSON-LD
+- `scripts/generate-sitemap.ts` — source from `ALL_ROUTES`, proper priorities
+- `scripts/prerender.ts` — match new schema set
+- `scripts/verify-prerender.ts` — assert schema matrix + unique meta
+- `public/robots.txt` — add explicit `Allow` lines, verify Sitemap directive
+- `src/lib/seo/keywordMap.ts` — no content changes; just confirm `ALL_ROUTES` export covers every public page
 
-`vercel.json`:
+**New helper**
 
-- Keep `cleanUrls: true`.
-- Add 301s for the 5 collapsed URLs → `/`.
-- Add explicit rewrite that prefers the directory's `index.html` (the `/((?!.*\\.).*)` rewrite currently sends every clean URL to `/index.html`, which BREAKS prerender — Vercel never serves `/tools/dns-lookup/index.html` because the rewrite intercepts first). Replace with a rewrite that only fires when no file exists:
-  ```json
-  "rewrites": [
-    { "source": "/((?!.*\\.|tools/|guides/|privacy|terms|disclaimer|about|contact|go/).*)", "destination": "/index.html" }
-  ]
-  ```
-  This is the single most important fix — without it the prerendered HTML is invisible to crawlers.
+- `src/lib/seo/highlightKeywords.tsx` — small util that takes a string + keyword list and returns React nodes with `<strong>` around matches (case-insensitive, first occurrence per keyword to avoid spam).
 
-`public/robots.txt`: keep, ensure sitemap line points at `https://site-host-finder.vercel.app/sitemap.xml`.
+**No changes to**
 
----
-
-## 7. Verification scripts (new)
-
-`scripts/verify-prerender.ts` — fetches every route from the live URL with `User-Agent: Googlebot/2.1` and asserts:
-
-- HTTP 200
-- `<h1>` matches `RouteContent.h1`
-- At least one FAQ `<details>` present (when route has FAQs)
-- All expected JSON-LD `@type` blocks present (Primary + Breadcrumb + FAQPage when applicable)
-- Canonical matches expected URL
-Outputs a table; non-zero exit on failure.
-
-Wire as `bun run seo:verify` and document running it after each Vercel deploy.
-
-`scripts/seo-audit.ts` — extend existing audit to also check: presence of `<table>`, at least one internal link, at least one outbound link, and one `/go/hostinger` link in body.
-
----
-
-## 8. Sitemap fix
-
-`scripts/generate-sitemap.ts` already uses real paths from `ALL_ROUTES`. After consolidation it will drop the 5 dead URLs automatically. Verify XML validates; ship the regenerated file under `public/sitemap.xml` and `dist/sitemap.xml`.
-
----
-
-## Deliverables checklist
-
-```
-[ ] keywordMap.ts: drop 5 dup routes, add 5 new tool routes, add tables + unique FAQs everywhere, move policy content here
-[ ] vercel.json:   add 301s, fix the catch-all rewrite that's currently shadowing prerendered HTML
-[ ] Index.tsx:     master Host Checker only; remove duplicate tool embeds + policy blocks; add table + unique FAQ
-[ ] Header/Footer: per spec above
-[ ] ToolPage/GuidePage/PolicyPage: render tables[]; render policy long-form
-[ ] scripts/prerender.ts:    home body, tables, robots meta
-[ ] scripts/seo-audit.ts:    extended checks
-[ ] scripts/verify-prerender.ts: new Googlebot verifier
-[ ] package.json:  add `seo:verify` script
-[ ] sitemap regenerated, robots verified
-```
-
----
-
-## Question before I build
-
-Confirm two things so I don't have to come back and redo work:
-
-1. **Collapse target**: should the 5 hosting-* URLs 301 to `/` (home is the master tool), or to `/tools/hosting-checker` (keep tools section clean, home stays a landing page)? My plan above assumes **home is master**, which is what you said. Confirm. CONFIRM
-2. **New tools to add** from your keyword data — confirm the 5 picks (`whois-lookup`, `ssl-checker`, `http-headers`, `reverse-ip-lookup`, `cms-detector`) or tell me to swap any. CONFIRM
+- Tool logic, edge functions, results view routing (already correct from prior turn)
+- `toolContent.json` content (already 1500+ words and approved)
