@@ -21,14 +21,8 @@ const VIEW_MAP: Record<string, "dns" | "whois" | "ssl" | "headers" | "ip" | "tec
   Hosting: undefined,
 };
 
-const PLACEHOLDER: Record<string, string> = {
-  DnsLookup: "Enter a domain to look up DNS records (e.g. example.com)",
-  WhoisLookup: "Enter a domain for WHOIS lookup (e.g. example.com)",
-  SslChecker: "Enter a domain to check SSL/TLS (e.g. example.com)",
-  HttpHeaders: "Enter a URL to inspect HTTP headers (e.g. example.com)",
-  ReverseIpLookup: "Enter a domain or IP for reverse lookup",
-  CmsDetector: "Enter a domain to detect CMS / platform",
-};
+
+
 
 function renderToolWidget(kind: RouteContent["toolComponent"]) {
   switch (kind) {
