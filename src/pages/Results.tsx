@@ -17,17 +17,7 @@ import { AdsterraNative } from "@/components/AdsterraNative";
 import { StickyMobileAd } from "@/components/StickyMobileAd";
 import type { HostingResult } from "@/lib/types";
 
-type ViewKind = "dns" | "whois" | "ssl" | "headers" | "ip" | "tech" | "all";
-
-const VIEW_TITLES: Record<ViewKind, string> = {
-  dns: "DNS Records",
-  whois: "WHOIS Registration",
-  ssl: "SSL / TLS Certificate",
-  headers: "HTTP & Security Headers",
-  ip: "IP & Reverse Hosting",
-  tech: "Detected Technologies & CMS",
-  all: "Full Hosting Report",
-};
+import { normalizeView, visibleSections, VIEW_TITLES, type ViewKind } from "@/lib/resultsView";
 
 
 /** Inject noindex meta and canonical pointing to / for /results/* pages. */
@@ -70,8 +60,7 @@ export default function Results() {
   const { domain } = useParams<{ domain: string }>();
   const decodedDomain = decodeURIComponent(domain || "");
   const [params] = useSearchParams();
-  const rawView = (params.get("view") || "all").toLowerCase() as ViewKind;
-  const view: ViewKind = (["dns", "whois", "ssl", "headers", "ip", "tech", "all"] as ViewKind[]).includes(rawView) ? rawView : "all";
+  const view: ViewKind = normalizeView(params.get("view"));
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["hosting", decodedDomain],
@@ -91,10 +80,7 @@ export default function Results() {
   );
 
   const showAll = view === "all";
-  const showOverview = showAll || view === "ip";
-  const showWhois = showAll || view === "whois";
-  const showSecurity = showAll || view === "ssl" || view === "headers";
-  const showDns = showAll || view === "dns" || view === "tech";
+  const { overview: showOverview, whois: showWhois, security: showSecurity, dns: showDns } = visibleSections(view);
 
   return (
     <div className="flex min-h-screen flex-col">

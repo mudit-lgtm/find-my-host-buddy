@@ -81,6 +81,9 @@ function RouteTable({ table }: { table: NonNullable<RouteContent["tables"]>[numb
 }
 
 export default function ToolPage({ route }: { route: RouteContent }) {
+  // Mobile-AEO helper: surface the first 3 FAQ questions as quick-scan bullets.
+  const keyPoints = route.faqs.slice(0, 3).map((f) => f.q);
+
   return (
     <div className="flex min-h-screen flex-col">
       <SeoHead route={route} />
@@ -97,14 +100,32 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           </ol>
         </nav>
 
-        <section className="container max-w-3xl mx-auto px-4 py-10 md:py-14">
-          <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-center">
+        <section className="container max-w-3xl mx-auto px-4 py-8 md:py-12">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-center">
             {route.h1}
           </h1>
-          <p className="mt-4 text-base md:text-lg text-muted-foreground text-center max-w-2xl mx-auto">
+          <p className="mt-3 text-sm sm:text-base md:text-lg text-muted-foreground text-center max-w-2xl mx-auto leading-relaxed">
             {route.intro}
           </p>
-          <div className="mt-8 rounded-2xl border bg-card p-5 md:p-6 shadow-sm">
+
+          {keyPoints.length > 0 && (
+            <aside
+              aria-label="Quick answers"
+              className="mt-5 mx-auto max-w-2xl rounded-xl border bg-muted/30 p-4 text-sm"
+            >
+              <p className="font-display font-semibold text-foreground mb-2">In short</p>
+              <ul className="space-y-1.5 text-muted-foreground">
+                {keyPoints.map((q) => (
+                  <li key={q} className="flex gap-2">
+                    <span aria-hidden className="text-primary mt-0.5">›</span>
+                    <span>{q}</span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
+
+          <div className="mt-6 rounded-2xl border bg-card p-4 sm:p-5 md:p-6 shadow-sm">
             {renderToolWidget(route.toolComponent)}
           </div>
         </section>
@@ -113,13 +134,23 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           <AdsterraNative />
         </div>
 
-        <section className="container max-w-3xl mx-auto px-4 py-10 space-y-6">
-          {route.sections.map((s) => (
-            <article key={s.heading}>
-              <h2 className="font-display text-xl md:text-2xl font-bold mb-3">{s.heading}</h2>
-              <p className="text-muted-foreground leading-relaxed">{s.body}</p>
-            </article>
-          ))}
+        <section className="container max-w-3xl mx-auto px-4 py-8 space-y-6">
+          {route.sections.map((s) => {
+            // Split on sentence end for scannable mobile paragraphs (1–2 sentences each).
+            const sentences = s.body.match(/[^.!?]+[.!?]+(\s|$)/g)?.map((x) => x.trim()).filter(Boolean) || [s.body];
+            const chunks: string[] = [];
+            for (let i = 0; i < sentences.length; i += 2) {
+              chunks.push(sentences.slice(i, i + 2).join(" "));
+            }
+            return (
+              <article key={s.heading}>
+                <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-3">{s.heading}</h2>
+                {chunks.map((c, i) => (
+                  <p key={i} className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3 last:mb-0">{c}</p>
+                ))}
+              </article>
+            );
+          })}
           {route.tables?.map((t) => <RouteTable key={t.caption} table={t} />)}
           <p className="text-sm text-muted-foreground border-l-2 border-primary/40 pl-3 italic">
             Need faster, more affordable hosting? <a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer" className="text-primary font-semibold hover:underline">Try Hostinger from $2.99/month →</a>
