@@ -134,13 +134,23 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           <AdsterraNative />
         </div>
 
-        <section className="container max-w-3xl mx-auto px-4 py-10 space-y-6">
-          {route.sections.map((s) => (
-            <article key={s.heading}>
-              <h2 className="font-display text-xl md:text-2xl font-bold mb-3">{s.heading}</h2>
-              <p className="text-muted-foreground leading-relaxed">{s.body}</p>
-            </article>
-          ))}
+        <section className="container max-w-3xl mx-auto px-4 py-8 space-y-6">
+          {route.sections.map((s) => {
+            // Split on sentence end for scannable mobile paragraphs (1–2 sentences each).
+            const sentences = s.body.match(/[^.!?]+[.!?]+(\s|$)/g)?.map((x) => x.trim()).filter(Boolean) || [s.body];
+            const chunks: string[] = [];
+            for (let i = 0; i < sentences.length; i += 2) {
+              chunks.push(sentences.slice(i, i + 2).join(" "));
+            }
+            return (
+              <article key={s.heading}>
+                <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-3">{s.heading}</h2>
+                {chunks.map((c, i) => (
+                  <p key={i} className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3 last:mb-0">{c}</p>
+                ))}
+              </article>
+            );
+          })}
           {route.tables?.map((t) => <RouteTable key={t.caption} table={t} />)}
           <p className="text-sm text-muted-foreground border-l-2 border-primary/40 pl-3 italic">
             Need faster, more affordable hosting? <a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer" className="text-primary font-semibold hover:underline">Try Hostinger from $2.99/month →</a>
