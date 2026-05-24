@@ -15,6 +15,22 @@ export interface RouteTable {
   rows: string[][];
 }
 
+export interface RichSection {
+  heading: string;
+  body: string;
+  bullets?: string[];
+}
+
+export interface UseCase {
+  title: string;
+  body: string;
+}
+
+export interface Troubleshoot {
+  problem: string;
+  solution: string;
+}
+
 export interface RouteContent {
   path: string;
   title: string;          // <60c
@@ -22,8 +38,18 @@ export interface RouteContent {
   h1: string;
   intro: string;          // AEO 40-60w intro paragraph
   keywords: string[];
-  sections: { heading: string; body: string }[];
+  /** Snippet-ready 1-2 sentence direct answer for AEO (lifted by ChatGPT/Perplexity/Google snippet). */
+  quickAnswer?: string;
+  /** Single line GEO note (worldwide + US emphasis). */
+  geoNote?: string;
+  /** Scannable bullets summarising what the page covers. */
+  keyPoints?: string[];
+  sections: RichSection[];
   tables?: RouteTable[];
+  /** Long-form real-world scenarios. */
+  useCases?: UseCase[];
+  /** Common problems + fixes. */
+  troubleshooting?: Troubleshoot[];
   faqs: FAQ[];
   related: { label: string; href: string }[];
   outbound: { label: string; href: string; rel?: string }[];
