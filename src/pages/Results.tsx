@@ -69,6 +69,9 @@ export default function Results() {
   useNoIndex();
   const { domain } = useParams<{ domain: string }>();
   const decodedDomain = decodeURIComponent(domain || "");
+  const [params] = useSearchParams();
+  const rawView = (params.get("view") || "all").toLowerCase() as ViewKind;
+  const view: ViewKind = (["dns", "whois", "ssl", "headers", "ip", "tech", "all"] as ViewKind[]).includes(rawView) ? rawView : "all";
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["hosting", decodedDomain],
@@ -86,6 +89,12 @@ export default function Results() {
     data.securityGrade === "D" ||
     data.securityGrade === "F"
   );
+
+  const showAll = view === "all";
+  const showOverview = showAll || view === "ip";
+  const showWhois = showAll || view === "whois";
+  const showSecurity = showAll || view === "ssl" || view === "headers";
+  const showDns = showAll || view === "dns" || view === "tech";
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -105,9 +114,10 @@ export default function Results() {
                 />
               )}
               <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-                Results for <span className="text-gradient">{decodedDomain}</span>
+                {VIEW_TITLES[view]} · <span className="text-gradient">{decodedDomain}</span>
               </h1>
             </div>
+
             <div className="w-full flex justify-center">
               <SearchBar defaultValue={decodedDomain} compact />
             </div>
