@@ -17,17 +17,7 @@ import { AdsterraNative } from "@/components/AdsterraNative";
 import { StickyMobileAd } from "@/components/StickyMobileAd";
 import type { HostingResult } from "@/lib/types";
 
-type ViewKind = "dns" | "whois" | "ssl" | "headers" | "ip" | "tech" | "all";
-
-const VIEW_TITLES: Record<ViewKind, string> = {
-  dns: "DNS Records",
-  whois: "WHOIS Registration",
-  ssl: "SSL / TLS Certificate",
-  headers: "HTTP & Security Headers",
-  ip: "IP & Reverse Hosting",
-  tech: "Detected Technologies & CMS",
-  all: "Full Hosting Report",
-};
+import { normalizeView, visibleSections, VIEW_TITLES, type ViewKind } from "@/lib/resultsView";
 
 
 /** Inject noindex meta and canonical pointing to / for /results/* pages. */
