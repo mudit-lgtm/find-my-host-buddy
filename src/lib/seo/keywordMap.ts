@@ -600,6 +600,43 @@ export const TOOL_ROUTES: RouteContent[] = [
   },
 ];
 
+// ---------- Overlay rich AEO/GEO content from toolContent.json -----------
+// Each tool gets: quickAnswer, geoNote, keyPoints, expanded sections w/ bullets,
+// useCases, troubleshooting, and 10+ FAQs (1500-2300 body words per page).
+import toolContentRaw from "./toolContent.json";
+type ToolContent = {
+  quickAnswer: string;
+  geoNote: string;
+  keyPoints: string[];
+  sections: RichSection[];
+  useCases: UseCase[];
+  troubleshooting: Troubleshoot[];
+  faqs: FAQ[];
+};
+const toolContent = toolContentRaw as Record<string, ToolContent>;
+const slugFromPath = (p: string) => p.replace(/^\/tools\//, "");
+
+for (const route of TOOL_ROUTES) {
+  const rich = toolContent[slugFromPath(route.path)];
+  if (!rich) continue;
+  route.quickAnswer = rich.quickAnswer;
+  route.geoNote = rich.geoNote;
+  route.keyPoints = rich.keyPoints;
+  route.sections = rich.sections;        // replace with the 7-9 rich sections
+  route.useCases = rich.useCases;
+  route.troubleshooting = rich.troubleshooting;
+  // Merge FAQs: keep originals first, append AI-generated, dedupe by question.
+  const seen = new Set(route.faqs.map((f) => f.q.toLowerCase()));
+  for (const f of rich.faqs) {
+    if (!seen.has(f.q.toLowerCase())) {
+      route.faqs.push(f);
+      seen.add(f.q.toLowerCase());
+    }
+  }
+}
+
+
+
 // ---------- GUIDES ----------
 
 export const GUIDE_ROUTES: RouteContent[] = [
