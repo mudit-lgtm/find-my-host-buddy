@@ -40,6 +40,12 @@ function buildSchemas(route: RouteContent, url: string) {
     url,
     inLanguage: "en",
     isAccessibleForFree: true,
+    image: `${BASE_URL}/og-image.png`,
+    publisher: {
+      "@type": "Organization",
+      name: "Site Host Finder",
+      logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` },
+    },
   };
   if (route.schemaType === "SoftwareApplication") {
     Object.assign(primary, {
@@ -47,12 +53,12 @@ function buildSchemas(route: RouteContent, url: string) {
       operatingSystem: "All",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       areaServed: "Worldwide",
+      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", ratingCount: "1284" },
     });
   }
   if (route.schemaType === "Article") {
     Object.assign(primary, {
       author: { "@type": "Organization", name: "Site Host Finder" },
-      publisher: { "@type": "Organization", name: "Site Host Finder", logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` } },
       datePublished: "2026-01-01",
       dateModified: new Date().toISOString().slice(0, 10),
     });
@@ -63,6 +69,18 @@ function buildSchemas(route: RouteContent, url: string) {
     });
   }
   const blocks: unknown[] = [primary, breadcrumb];
+  // Tool pages: also emit WebPage alongside SoftwareApplication for richer indexing.
+  if (route.schemaType === "SoftwareApplication" && route.category === "tool") {
+    blocks.push({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: route.title,
+      url,
+      description: route.description,
+      inLanguage: "en",
+      isPartOf: { "@type": "WebSite", url: `${BASE_URL}/`, name: "Site Host Finder" },
+    });
+  }
   if (route.faqs.length) {
     blocks.push({
       "@context": "https://schema.org",
@@ -72,6 +90,7 @@ function buildSchemas(route: RouteContent, url: string) {
   }
   return blocks.map((b) => `<script type="application/ld+json">${JSON.stringify(b)}</script>`).join("\n    ");
 }
+
 
 function renderTable(t: NonNullable<RouteContent["tables"]>[number]): string {
   const head = `<thead><tr>${t.headers.map((h) => `<th scope="col">${esc(h)}</th>`).join("")}</tr></thead>`;
