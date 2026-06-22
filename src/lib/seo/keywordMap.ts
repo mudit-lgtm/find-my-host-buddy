@@ -86,15 +86,16 @@ const SSL_LABS = { label: "SSL Labs — Server Test", href: "https://www.ssllabs
 
 export const HOME_ROUTE: RouteContent = {
   path: "/",
-  title: "Host Checker — Find Who Hosts Any Website Free",
-  description: "Free host checker. Find website host, hosting provider, server IP, DNS records & WHOIS for any domain in seconds — no signup, unlimited.",
-  h1: "Host Checker — Find Who Is Hosting Any Website",
-  intro: "Site Host Finder is the free host checker that identifies who hosts any website in seconds. Paste a domain to find website host, hosting provider, server IP, server location, nameservers, DNS records, and WHOIS data — no signup, unlimited lookups, accurate worldwide.",
+  title: "Check Host — Free Host Checker: Find Who Hosts Any Website",
+  description: "✅ Free Host Checker — paste a domain to instantly check host, find website host, hosting provider, IP, DNS & WHOIS. No signup, unlimited lookups, 3-second results.",
+  h1: "Host Checker — Check Host & Find Who Is Hosting Any Website",
+  intro: "Free host checker (a.k.a. checkhost / hostchecker / check-host) that finds who hosts any website in seconds. Paste a domain to check host, find the hosting provider, server IP, server location, nameservers, DNS records, and WHOIS data — no signup, unlimited lookups, accurate worldwide.",
   keywords: [
-    "host checker", "hosting checker", "find website host", "where is website hosted",
+    "check host", "host checker", "hostchecker", "checkhost", "check-host",
+    "hosting checker", "find website host", "where is website hosted", "where is it hosted",
     "who is hosting", "who hosts this site", "hosting lookup", "web hosting lookup",
-    "find my host", "check host", "host finder", "web host checker",
-    "where is my website hosted", "find out who is hosting any website",
+    "find my host", "host finder", "web host checker", "ip host checker",
+    "where is my website hosted", "find out who is hosting any website", "cek host",
   ],
   sections: [
     {
