@@ -30,4 +30,4 @@ Allow: /guides/
 Disallow: /results/
 Disallow: /go/
 
-Sitemap: https://site-host-finder.vercel.app/sitemap.xml
+Sitemap: https://sitehostfinder.online/sitemap.xml

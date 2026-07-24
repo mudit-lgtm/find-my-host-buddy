@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { CopyButton } from "@/components/CopyButton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,13 @@ import { Search, ArrowRightLeft } from "lucide-react";
 import type { HostingResult } from "@/lib/types";
 
 async function fetchHostingData(domain: string): Promise<HostingResult> {
-  const { data, error } = await supabase.functions.invoke("hosting-lookup", {
+  const { data, error } = await invokeWithRetry<HostingResult>("hosting-lookup", {
     body: { domain },
+    timeoutMs: 20000,
+    retries: 2,
   });
-  if (error) throw new Error(error.message || "Lookup failed");
-  return data as HostingResult;
+  if (error || !data) throw new Error(error?.message || "Lookup failed");
+  return data;
 }
 
 function extractDomain(input: string): string {

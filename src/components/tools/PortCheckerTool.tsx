@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { Loader2 } from "lucide-react";
 
 export function PortCheckerTool() {
@@ -16,7 +16,7 @@ export function PortCheckerTool() {
     setLoading(true);
     setResult(null);
     try {
-      const { data } = await supabase.functions.invoke("hosting-lookup", {
+      const { data } = await invokeWithRetry<{ siteStatus?: { isUp: boolean; statusCode: number } }>("hosting-lookup", {
         body: { domain: host.replace(/^(https?:\/\/)?(www\.)?/, "").split("/")[0] },
       });
       if (data?.siteStatus?.isUp) {

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { SearchBar } from "@/components/SearchBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -30,7 +30,7 @@ function useNoIndex() {
 
     const existingCanonical = document.querySelector('link[rel="canonical"]');
     const prevHref = existingCanonical?.getAttribute("href") ?? null;
-    if (existingCanonical) existingCanonical.setAttribute("href", "https://site-host-finder.vercel.app/");
+    if (existingCanonical) existingCanonical.setAttribute("href", "https://sitehostfinder.online/");
 
     return () => {
       robots.remove();
@@ -40,11 +40,13 @@ function useNoIndex() {
 }
 
 async function fetchHostingData(domain: string): Promise<HostingResult> {
-  const { data, error } = await supabase.functions.invoke("hosting-lookup", {
+  const { data, error } = await invokeWithRetry<HostingResult>("hosting-lookup", {
     body: { domain },
+    timeoutMs: 20000,
+    retries: 2,
   });
-  if (error) throw new Error(error.message || "Lookup failed");
-  return data as HostingResult;
+  if (error || !data) throw new Error(error?.message || "Lookup failed");
+  return data;
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {

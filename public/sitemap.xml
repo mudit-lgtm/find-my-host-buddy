@@ -1,122 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://site-host-finder.vercel.app/</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/tools/dns-lookup</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/tools/dns-lookup</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/tools/whois-lookup</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/tools/whois-lookup</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/tools/ip-checker</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/tools/ip-checker</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/tools/reverse-ip-lookup</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/tools/reverse-ip-lookup</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/tools/ssl-checker</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/tools/ssl-checker</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/tools/http-headers</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/tools/http-headers</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/tools/cms-detector</loc>
-    <lastmod>2026-05-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://site-host-finder.vercel.app/tools/website-down-checker</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/tools/cms-detector</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/tools/port-checker</loc>
-    <lastmod>2026-05-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://site-host-finder.vercel.app/tools/domain-compare</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/tools/website-down-checker</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/guides/what-is-web-hosting</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/tools/port-checker</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://sitehostfinder.online/tools/domain-compare</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://sitehostfinder.online/guides/what-is-web-hosting</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/guides/shared-vs-vps-vs-cloud-hosting</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/guides/shared-vs-vps-vs-cloud-hosting</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/guides/how-to-find-where-a-website-is-hosted</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/guides/how-to-find-where-a-website-is-hosted</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/guides/best-web-hosting-for-beginners</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/guides/best-web-hosting-for-beginners</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/privacy</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/terms</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/disclaimer</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/disclaimer</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/about</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/about</loc>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://site-host-finder.vercel.app/contact</loc>
-    <lastmod>2026-05-24</lastmod>
+    <loc>https://sitehostfinder.online/contact</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
