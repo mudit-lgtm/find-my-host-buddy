@@ -1,7 +1,7 @@
 // Single source of truth for SEO content across all routes.
 // Used by: page components (titles/H1/FAQ/tables), sitemap generator, prerender script, and SEO audit.
 
-export const BASE_URL = "https://site-host-finder.vercel.app";
+export const BASE_URL = "https://sitehostfinder.online";
 export const HOSTINGER_REF = "/go/hostinger"; // cloaked affiliate
 
 export interface FAQ {

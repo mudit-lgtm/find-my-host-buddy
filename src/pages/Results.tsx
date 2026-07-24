@@ -30,7 +30,7 @@ function useNoIndex() {
 
     const existingCanonical = document.querySelector('link[rel="canonical"]');
     const prevHref = existingCanonical?.getAttribute("href") ?? null;
-    if (existingCanonical) existingCanonical.setAttribute("href", "https://site-host-finder.vercel.app/");
+    if (existingCanonical) existingCanonical.setAttribute("href", "https://sitehostfinder.online/");
 
     return () => {
       robots.remove();
