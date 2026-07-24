@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeWithRetry } from "@/lib/invokeWithRetry";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 export function IsItUpTool() {
@@ -15,9 +15,10 @@ export function IsItUpTool() {
     setLoading(true);
     setResult(null);
     try {
-      const { data } = await supabase.functions.invoke("hosting-lookup", {
-        body: { domain: domain.replace(/^(https?:\/\/)?(www\.)?/, "").split("/")[0] },
-      });
+      const { data } = await invokeWithRetry<{ siteStatus?: { isUp: boolean; responseTime: number; statusCode: number } }>(
+        "hosting-lookup",
+        { body: { domain: domain.replace(/^(https?:\/\/)?(www\.)?/, "").split("/")[0] } },
+      );
       setResult({
         isUp: data?.siteStatus?.isUp ?? false,
         responseTime: data?.siteStatus?.responseTime ?? 0,
