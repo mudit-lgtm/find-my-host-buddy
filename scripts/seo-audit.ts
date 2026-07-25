@@ -52,6 +52,37 @@ for (const r of ALL_ROUTES) {
   if (!/<div id="seo-prerender"/.test(html)) {
     issues.push({ path: r.path, problem: "missing #seo-prerender wrapper" });
   }
+
+  // AEO blocks: key takeaways, common errors, summary (tools + home).
+  if (r.category === "tool" || r.category === "home") {
+    if (!/id="key-takeaways"/.test(html)) issues.push({ path: r.path, problem: "missing key takeaways block" });
+    if (!/id="common-errors"/.test(html)) issues.push({ path: r.path, problem: "missing common errors block" });
+    if (!/id="summary"/.test(html)) issues.push({ path: r.path, problem: "missing summary block" });
+  }
+  if (!/id="speakable-intro"/.test(html)) {
+    issues.push({ path: r.path, problem: "missing #speakable-intro (speakable schema target)" });
+  }
+  if (r.faqs.length > 0 && !/id="faq"/.test(html)) {
+    issues.push({ path: r.path, problem: "missing #faq anchor" });
+  }
+  if (/"@type":"SoftwareApplication"[^}]*areaServed/.test(html.replace(/\s/g, ""))) {
+    issues.push({ path: r.path, problem: "areaServed present on SoftwareApplication schema" });
+  }
+  if (html.includes("site-host-finder.vercel.app")) {
+    issues.push({ path: r.path, problem: "stale old-domain reference" });
+  }
+
+  // Word-count floor on the prerendered body.
+  const bodyText = (html.match(/<div id="seo-prerender"[\s\S]*?<\/div>/) || [""])[0]
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const words = bodyText ? bodyText.split(" ").length : 0;
+  const floor = r.category === "policy" ? 250 : 600;
+  if (words < floor) {
+    issues.push({ path: r.path, problem: `thin content: ${words} words (min ${floor})` });
+  }
+
 }
 
 
