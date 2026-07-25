@@ -8,7 +8,7 @@ import { SEOContent } from "@/components/SEOContent";
 import { AdsterraAd } from "@/components/AdsterraAd";
 import { AdsterraNative } from "@/components/AdsterraNative";
 import { StickyMobileAd } from "@/components/StickyMobileAd";
-import { TOOL_ROUTES } from "@/lib/seo/keywordMap";
+import { TOOL_ROUTES, HOME_ROUTE } from "@/lib/seo/keywordMap";
 import {
   Server, Globe, Activity, Wifi, Shield, ArrowRightLeft,
   Lock, FileSearch, Code2, Network, ChevronRight,
@@ -41,9 +41,10 @@ const Index = () => {
               Find out who is hosting{" "}
               <span className="text-gradient">any website</span>
             </h1>
-            <p className="mt-4 text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl">
-              Free host checker — paste a domain to instantly find the hosting provider, IP, server location, DNS records & WHOIS.
+            <p id="speakable-intro" className="mt-4 text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl">
+              Free host checker — paste a domain to instantly find the hosting provider, IP, server location, DNS records &amp; WHOIS.
             </p>
+
             <div className="mt-8 w-full flex justify-center">
               <SearchBar />
             </div>
@@ -63,7 +64,26 @@ const Index = () => {
         </section>
 
         <TrustFactors />
+
+        {/* KEY TAKEAWAYS — AEO answer block */}
+        {HOME_ROUTE.keyTakeaways && (
+          <section id="key-takeaways" className="container max-w-3xl mx-auto px-4 pt-10">
+            <div className="rounded-xl border border-primary/20 bg-primary/[0.04] p-4 sm:p-5">
+              <h2 className="font-display font-bold text-foreground text-base sm:text-lg mb-3">Key takeaways</h2>
+              <ul className="space-y-2 text-sm sm:text-base text-foreground/90">
+                {HOME_ROUTE.keyTakeaways.map((k) => (
+                  <li key={k} className="flex gap-2">
+                    <span aria-hidden className="text-primary font-bold mt-0.5">✓</span>
+                    <span>{k}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
+
         <HowToSection />
+
 
         {/* Tools grid — every card links to its own dedicated /tools/* page */}
         <section className="container max-w-6xl mx-auto px-4 py-14 border-t">

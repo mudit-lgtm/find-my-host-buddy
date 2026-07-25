@@ -104,9 +104,10 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-center">
             {route.h1}
           </h1>
-          <p className="mt-3 text-sm sm:text-base md:text-lg text-muted-foreground text-center max-w-2xl mx-auto leading-relaxed">
+          <p id="speakable-intro" className="mt-3 text-sm sm:text-base md:text-lg text-muted-foreground text-center max-w-2xl mx-auto leading-relaxed">
             {heroDescription}
           </p>
+
 
           {/* THE TOOL — prominent card */}
           <div className="mt-6 md:mt-8 rounded-2xl border-2 border-primary/20 bg-card p-5 sm:p-6 md:p-8 shadow-lg shadow-primary/5">
@@ -131,6 +132,26 @@ export default function ToolPage({ route }: { route: RouteContent }) {
             <p className="mt-2 text-center text-xs text-muted-foreground italic">🌐 {route.geoNote}</p>
           )}
         </section>
+
+        {/* KEY TAKEAWAYS — AEO answer block right under the tool */}
+        {route.keyTakeaways && route.keyTakeaways.length > 0 && (
+          <section id="key-takeaways" className="container max-w-3xl mx-auto px-4 pb-4">
+            <div className="rounded-xl border border-primary/20 bg-primary/[0.04] p-4 sm:p-5">
+              <h2 className="font-display font-bold text-foreground text-base sm:text-lg mb-3">
+                Key takeaways
+              </h2>
+              <ul className="space-y-2 text-sm sm:text-base text-foreground/90">
+                {route.keyTakeaways.map((k) => (
+                  <li key={k} className="flex gap-2">
+                    <span aria-hidden className="text-primary font-bold mt-0.5">✓</span>
+                    <span>{highlightKeywords(k, route.keywords)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
+
 
         <div className="container max-w-3xl mx-auto px-4">
           <AdsterraNative />
@@ -224,13 +245,30 @@ export default function ToolPage({ route }: { route: RouteContent }) {
             </article>
           )}
 
+          {route.commonErrors && route.commonErrors.length > 0 && (
+            <article id="common-errors">
+              <h2 className="font-display text-lg sm:text-xl md:text-2xl font-bold mb-4 border-b-2 border-primary/30 pb-2 inline-block">
+                Common mistakes &amp; how to fix them
+              </h2>
+              <dl className="space-y-3">
+                {route.commonErrors.map((e) => (
+                  <div key={e.mistake} className="rounded-lg border bg-card p-3 sm:p-4">
+                    <dt className="font-display font-semibold text-foreground text-sm mb-1">❌ {e.mistake}</dt>
+                    <dd className="text-xs sm:text-sm text-muted-foreground leading-relaxed">✅ {e.fix}</dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+          )}
+
           <p className="text-sm text-muted-foreground border-l-2 border-primary/40 pl-3 italic">
             Need faster, more affordable hosting? <a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer" className="text-primary font-semibold hover:underline">Try Hostinger from $2.99/month →</a>
           </p>
         </section>
 
         {route.faqs.length > 0 && (
-          <section className="container max-w-3xl mx-auto px-4 py-10 border-t">
+          <section id="faq" className="container max-w-3xl mx-auto px-4 py-10 border-t">
+
             <h2 className="font-display text-2xl font-bold mb-6">Frequently Asked Questions</h2>
             <div className="space-y-3">
               {route.faqs.map((f) => (
@@ -280,7 +318,17 @@ export default function ToolPage({ route }: { route: RouteContent }) {
             </ul>
           </section>
         )}
+
+        {route.summary && (
+          <section id="summary" className="container max-w-3xl mx-auto px-4 py-10 border-t">
+            <h2 className="font-display text-xl font-bold mb-3">Summary</h2>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              {highlightKeywords(route.summary, route.keywords)}
+            </p>
+          </section>
+        )}
       </main>
+
 
       <Footer />
       <StickyMobileAd />

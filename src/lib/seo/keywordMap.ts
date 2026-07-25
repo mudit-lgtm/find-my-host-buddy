@@ -1,8 +1,11 @@
 // Single source of truth for SEO content across all routes.
 // Used by: page components (titles/H1/FAQ/tables), sitemap generator, prerender script, and SEO audit.
 
+import { ROUTE_EXTRAS } from "./toolExtras";
+
 export const BASE_URL = "https://sitehostfinder.online";
 export const HOSTINGER_REF = "/go/hostinger"; // cloaked affiliate
+
 
 export interface FAQ {
   q: string;
@@ -31,6 +34,12 @@ export interface Troubleshoot {
   solution: string;
 }
 
+export interface CommonError {
+  mistake: string;
+  fix: string;
+}
+
+
 export interface RouteContent {
   path: string;
   title: string;          // <60c
@@ -44,6 +53,13 @@ export interface RouteContent {
   geoNote?: string;
   /** Scannable bullets summarising what the page covers. */
   keyPoints?: string[];
+  /** 3-5 AEO key takeaways rendered directly under the hero. */
+  keyTakeaways?: string[];
+  /** Common mistakes + fixes (rendered as a definition list). */
+  commonErrors?: CommonError[];
+  /** Closing "final summary" paragraph. */
+  summary?: string;
+
   sections: RichSection[];
   tables?: RouteTable[];
   /** Long-form real-world scenarios. */
@@ -87,7 +103,7 @@ const SSL_LABS = { label: "SSL Labs — Server Test", href: "https://www.ssllabs
 export const HOME_ROUTE: RouteContent = {
   path: "/",
   title: "Check Host — Free Host Checker: Find Who Hosts Any Website",
-  description: "✅ Free Host Checker — paste a domain to instantly check host, find website host, hosting provider, IP, DNS & WHOIS. No signup, unlimited lookups, 3-second results.",
+  description: "Free host checker — paste any domain to instantly find its hosting provider, IP address, server location, DNS records and WHOIS data. No signup needed.",
   h1: "Host Checker — Check Host & Find Who Is Hosting Any Website",
   intro: "Free host checker (a.k.a. checkhost / hostchecker / check-host) that finds who hosts any website in seconds. Paste a domain to check host, find the hosting provider, server IP, server location, nameservers, DNS records, and WHOIS data — no signup, unlimited lookups, accurate worldwide.",
   keywords: [
@@ -191,8 +207,9 @@ const related = (excludePath: string) =>
 export const TOOL_ROUTES: RouteContent[] = [
   {
     path: "/tools/dns-lookup",
-    title: "DNS Lookup — Free A, AAAA, MX, NS, TXT, CNAME Checker",
-    description: "Free DNS lookup tool. View A, AAAA, MX, NS, TXT & CNAME records for any domain — instant results, no signup, unlimited queries.",
+    title: "DNS Lookup Tool — Check A, MX, NS & TXT Records Free",
+    description: "Free DNS lookup tool: check A, AAAA, MX, NS, TXT and CNAME records for any domain in seconds. Instant results, no signup, unlimited queries.",
+
     h1: "DNS Lookup — Free DNS Records Checker",
     intro: "Look up DNS records for any domain in real time. Our free DNS lookup returns A, AAAA, MX, NS, TXT, and CNAME records — essential for debugging email, verifying nameserver changes, confirming DNS propagation worldwide, and auditing how a domain is wired up.",
     keywords: ["dns lookup", "dns records", "nameserver lookup", "mx record check", "txt record lookup", "cname lookup", "dns hosting checker"],
@@ -234,8 +251,9 @@ export const TOOL_ROUTES: RouteContent[] = [
   },
   {
     path: "/tools/whois-lookup",
-    title: "WHOIS Lookup — Free Domain WHOIS & Owner Checker",
-    description: "Free WHOIS lookup. Find domain owner, registrar, registration date, expiry, nameservers & domain age for any domain instantly.",
+    title: "WHOIS Lookup — Find Any Domain's Owner & Registrar",
+    description: "Free WHOIS lookup: find the domain owner, registrar, creation and expiry dates, nameservers and domain age for any domain instantly. No signup.",
+
     h1: "WHOIS Lookup — Free Domain WHOIS & Owner Checker",
     intro: "Look up WHOIS records for any domain — registrar, registration date, expiry date, domain age, nameservers, and (when not privacy-protected) the registered owner. Free, instant, unlimited, and works on every public TLD.",
     keywords: ["whois lookup", "domain whois", "who owns this domain", "domain registration lookup", "domain age checker", "registrar lookup"],
@@ -276,8 +294,9 @@ export const TOOL_ROUTES: RouteContent[] = [
   },
   {
     path: "/tools/ip-checker",
-    title: "IP Checker — What's My IP & IP Host Lookup Free",
-    description: "Free IP checker. See your public IP address and look up the hosting provider, location & ASN of any IPv4 or IPv6 address.",
+    title: "IP Checker — What Is My IP & Look Up Any IP Host",
+    description: "Free IP checker: see your public IPv4 and IPv6 address, then look up any IP's hosting provider, ASN and server location instantly. No signup.",
+
     h1: "IP Checker — What's My IP & IP Host Lookup",
     intro: "Our free IP checker shows your public IPv4 address instantly, plus lets you look up any IP's hosting provider, ASN, and geographic location. Useful for VPN verification, firewall whitelists, network troubleshooting, and answering 'what is my IP' or 'ip host checker' queries.",
     keywords: ["what is my ip", "ip address lookup", "ip checker", "ip host checker", "find ip host", "ipv4 lookup", "ipv6 lookup"],
@@ -316,8 +335,9 @@ export const TOOL_ROUTES: RouteContent[] = [
   },
   {
     path: "/tools/reverse-ip-lookup",
-    title: "Reverse IP Lookup — Find Sites on the Same Server",
-    description: "Free reverse IP lookup. See which websites share an IP address or hosting server — great for shared-hosting research & competitor intel.",
+    title: "Reverse IP Lookup — Find All Sites on One Server",
+    description: "Free reverse IP lookup: find every website hosted on the same IP or server. Perfect for shared-hosting checks, competitor research and SEO audits.",
+
     h1: "Reverse IP Lookup — Sites Hosted on the Same Server",
     intro: "Run a reverse IP lookup to see every domain that resolves to a given IP address. Useful for spotting shared-hosting neighbours, mapping a hosting account, hunting for related sites, or qualifying server quality before you migrate.",
     keywords: ["reverse ip lookup", "sites on same server", "shared hosting lookup", "domains on ip", "reverse dns"],
@@ -354,8 +374,9 @@ export const TOOL_ROUTES: RouteContent[] = [
   },
   {
     path: "/tools/ssl-checker",
-    title: "SSL Checker — Free HTTPS Certificate Inspector",
-    description: "Free SSL checker. Verify any site's HTTPS certificate — issuer, expiry, key strength, chain, and TLS version. Instant, no signup.",
+    title: "SSL Checker — Test Any Site's HTTPS Certificate",
+    description: "Free SSL checker: test any website's HTTPS certificate — issuer, expiry date, key strength, chain and TLS version. Instant results, no signup.",
+
     h1: "SSL Checker — Free HTTPS Certificate Inspector",
     intro: "Verify any website's SSL/TLS certificate in seconds. Our free SSL checker shows the issuer, validity dates, subject and SAN domains, key strength, chain of trust, and supported TLS versions — useful for confirming an HTTPS rollout, debugging certificate errors, and spotting weak crypto.",
     keywords: ["ssl checker", "check ssl certificate", "https checker", "tls checker", "ssl certificate lookup"],
@@ -394,8 +415,9 @@ export const TOOL_ROUTES: RouteContent[] = [
   },
   {
     path: "/tools/http-headers",
-    title: "HTTP Header Checker — Inspect Response Headers Free",
-    description: "Free HTTP header checker. View response headers, status code, redirects, security headers & cache policy for any URL.",
+    title: "HTTP Header Checker — Check Response Headers Free",
+    description: "Free HTTP header checker: view response headers, status codes, redirect chains, security headers and cache policy for any URL. Instant, no signup.",
+
     h1: "HTTP Header Checker — Inspect Response Headers",
     intro: "Inspect the HTTP response headers of any URL in real time. Our free HTTP header checker shows the status code, server banner, content type, cache policy, security headers (HSTS, CSP, X-Frame-Options), redirect chain, and cookies — essential for debugging caching, SEO, and security configuration.",
     keywords: ["http header checker", "response headers", "http status code checker", "redirect checker", "security headers"],
@@ -434,8 +456,9 @@ export const TOOL_ROUTES: RouteContent[] = [
   },
   {
     path: "/tools/cms-detector",
-    title: "CMS Detector — What CMS Is This Website Using? (Free CMS Checker)",
-    description: "✅ Free CMS Detector — instantly check what CMS a website is using. Detect WordPress, Shopify, Wix, Webflow, Squarespace, Drupal, Ghost & 50+ platforms. No signup.",
+    title: "CMS Detector — Check What CMS Any Website Is Using",
+    description: "Free CMS detector: check what CMS any website is using — WordPress, Shopify, Wix, Webflow, Drupal, Ghost and 50+ platforms. Instant, no signup.",
+
     h1: "CMS Detector — What CMS Is This Website Using?",
     intro: "Free CMS detector and CMS checker — paste any URL to instantly detect what CMS, e-commerce platform, or website builder a site is using. Identifies WordPress, Shopify, Wix, Webflow, Squarespace, Drupal, Joomla, Ghost, Magento, BigCommerce and 50+ other platforms by inspecting HTML markup, HTTP headers, asset paths, cookies, and meta tags.",
     keywords: [
@@ -516,8 +539,9 @@ export const TOOL_ROUTES: RouteContent[] = [
   },
   {
     path: "/tools/website-down-checker",
-    title: "Is It Down? — Free Website Down Checker",
-    description: "Check if any website is down for everyone or just you. Free website down checker — real-time HTTP status, response time, reachability.",
+    title: "Website Down Checker — Is It Down or Just Me?",
+    description: "Free website down checker: find out if a site is down for everyone or just you. Live HTTP status, response time and reachability in seconds. No signup.",
+
     h1: "Is This Website Down? — Free Down Checker",
     intro: "Check whether a website is down for everyone or just you. Our free website down checker pings the URL from our servers in real time and reports HTTP status code, response time, and reachability — no signup, instant answer, unlimited probes.",
     keywords: ["is it up", "is it down", "website down checker", "site down", "is this site down", "down for everyone or just me"],
@@ -557,8 +581,9 @@ export const TOOL_ROUTES: RouteContent[] = [
   },
   {
     path: "/tools/port-checker",
-    title: "Port Checker — Test if a TCP Port Is Open Free",
-    description: "Free port checker. Test if any TCP port is open on a server — perfect for firewall debugging and service availability checks.",
+    title: "Port Checker — Test if a TCP Port Is Open Online",
+    description: "Free port checker: test if any TCP port is open on a server or IP address. Ideal for firewall debugging, SSH, SMTP and service availability checks.",
+
     h1: "Port Checker — Test Open TCP Ports",
     intro: "Test whether a specific TCP port is open on any public host. Our free port checker is perfect for firewall debugging, verifying services like SSH, HTTPS, SMTP, and MySQL are reachable from the public internet, and diagnosing 'connection refused' errors.",
     keywords: ["port checker", "open port test", "tcp port check", "is port open", "online port scanner"],
@@ -600,8 +625,9 @@ export const TOOL_ROUTES: RouteContent[] = [
   },
   {
     path: "/tools/domain-compare",
-    title: "Domain Compare — Side-by-Side Hosting Comparison",
-    description: "Compare two domains side by side — hosting provider, IP, DNS, WHOIS, performance & SSL. Free domain compare tool.",
+    title: "Domain Compare — Compare Two Sites' Hosting Setup",
+    description: "Compare two domains side by side: hosting provider, IP, DNS records, WHOIS, SSL and performance in one view. Free domain comparison, no signup.",
+
     h1: "Domain Compare — Side-by-Side Hosting Comparison",
     intro: "Compare two domains side by side — hosting provider, server location, DNS records, WHOIS, SSL grade, and performance. Perfect for competitive research, agency client audits, and migration planning. Free with no signup and unlimited comparisons.",
     keywords: ["compare domains", "domain compare", "side by side hosting compare", "competitor hosting research", "compare web hosts"],
@@ -978,6 +1004,9 @@ export const POLICY_ROUTES: RouteContent[] = [
     faqs: [],
     related: [
       { label: "About Us", href: "/about" },
+      { label: "DNS Lookup", href: "/tools/dns-lookup" },
+      { label: "Hosting Guide", href: "/guides/what-is-web-hosting" },
+
       { label: "Host Checker", href: "/" },
     ],
     outbound: [],
@@ -988,7 +1017,17 @@ export const POLICY_ROUTES: RouteContent[] = [
   },
 ];
 
+// Merge AEO enrichment blocks (key takeaways / common errors / summary) into routes.
+for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
+  const extras = ROUTE_EXTRAS[route.path];
+  if (!extras) continue;
+  route.keyTakeaways = extras.keyTakeaways;
+  route.commonErrors = extras.commonErrors;
+  route.summary = extras.summary;
+}
+
 export const ALL_ROUTES: RouteContent[] = [
+
   HOME_ROUTE,
   ...TOOL_ROUTES,
   ...GUIDE_ROUTES,

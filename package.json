@@ -9,7 +9,10 @@
     "postbuild": "tsx scripts/prerender.ts && tsx scripts/generate-sitemap.ts",
     "build:dev": "vite build --mode development",
     "seo:audit": "tsx scripts/seo-audit.ts",
+    "seo:validate": "tsx scripts/validate-seo-assets.ts",
+    "seo:review": "vite build && tsx scripts/seo-audit.ts && tsx scripts/validate-seo-assets.ts",
     "seo:verify": "tsx scripts/verify-prerender.ts",
+
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",

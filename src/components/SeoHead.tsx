@@ -56,6 +56,11 @@ export function SeoHead({ route }: SeoHeadProps) {
     inLanguage: "en",
     isAccessibleForFree: true,
     image: `${BASE_URL}/og-image.png`,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: route.faqs.length > 0 ? ["#speakable-intro", "#faq"] : ["#speakable-intro"],
+    },
+
     publisher: {
       "@type": "Organization",
       name: "Site Host Finder",
@@ -65,13 +70,13 @@ export function SeoHead({ route }: SeoHeadProps) {
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "All",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      areaServed: "Worldwide",
       aggregateRating: {
         "@type": "AggregateRating",
         ratingValue: "4.8",
         ratingCount: "1284",
       },
     }),
+
     ...(route.schemaType === "Article" && {
       author: { "@type": "Organization", name: "Site Host Finder" },
       datePublished: "2026-01-01",
