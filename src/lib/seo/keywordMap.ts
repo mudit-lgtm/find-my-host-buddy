@@ -1004,6 +1004,9 @@ export const POLICY_ROUTES: RouteContent[] = [
     faqs: [],
     related: [
       { label: "About Us", href: "/about" },
+      { label: "DNS Lookup", href: "/tools/dns-lookup" },
+      { label: "Hosting Guide", href: "/guides/what-is-web-hosting" },
+
       { label: "Host Checker", href: "/" },
     ],
     outbound: [],
