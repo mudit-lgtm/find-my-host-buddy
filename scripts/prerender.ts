@@ -41,21 +41,26 @@ function buildSchemas(route: RouteContent, url: string) {
     inLanguage: "en",
     isAccessibleForFree: true,
     image: `${BASE_URL}/og-image.png`,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: route.faqs.length ? ["#speakable-intro", "#faq"] : ["#speakable-intro"],
+    },
     publisher: {
       "@type": "Organization",
       name: "Site Host Finder",
       logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` },
     },
   };
+
   if (route.schemaType === "SoftwareApplication") {
     Object.assign(primary, {
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "All",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      areaServed: "Worldwide",
       aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", ratingCount: "1284" },
     });
   }
+
   if (route.schemaType === "Article") {
     Object.assign(primary, {
       author: { "@type": "Organization", name: "Site Host Finder" },
@@ -109,6 +114,9 @@ function renderStaticBody(route: RouteContent): string {
     ? `<aside id="quick-answer"><p><strong>Quick answer:</strong> ${esc(route.quickAnswer)}</p></aside>`
     : "";
   const geo = route.geoNote ? `<p><em>${esc(route.geoNote)}</em></p>` : "";
+  const takeaways = route.keyTakeaways && route.keyTakeaways.length
+    ? `<section id="key-takeaways"><h2>Key takeaways</h2><ul>${route.keyTakeaways.map((k) => `<li>${esc(k)}</li>`).join("")}</ul></section>`
+    : "";
   const keyPoints = route.keyPoints && route.keyPoints.length
     ? `<section aria-label="What this page covers"><h2>What this page covers</h2><ul>${route.keyPoints.map((k) => `<li>${esc(k)}</li>`).join("")}</ul></section>`
     : "";
@@ -118,9 +126,15 @@ function renderStaticBody(route: RouteContent): string {
   const trouble = route.troubleshooting && route.troubleshooting.length
     ? `<section><h2>Troubleshooting</h2><dl>${route.troubleshooting.map((t) => `<dt>${esc(t.problem)}</dt><dd>${esc(t.solution)}</dd>`).join("")}</dl></section>`
     : "";
+  const errors = route.commonErrors && route.commonErrors.length
+    ? `<section id="common-errors"><h2>Common mistakes and how to fix them</h2><dl>${route.commonErrors.map((e) => `<dt>${esc(e.mistake)}</dt><dd>${esc(e.fix)}</dd>`).join("")}</dl></section>`
+    : "";
+  const summary = route.summary
+    ? `<section id="summary"><h2>Summary</h2><p>${esc(route.summary)}</p></section>`
+    : "";
   const tables = (route.tables || []).map(renderTable).join("");
   const faqs = route.faqs.length
-    ? `<section><h2>Frequently Asked Questions</h2>${route.faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("")}</section>`
+    ? `<section id="faq"><h2>Frequently Asked Questions</h2>${route.faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("")}</section>`
     : "";
   const related = route.related.length
     ? `<nav aria-label="Related"><h2>Related</h2><ul>${route.related.map((r) => `<li><a href="${r.href}">${esc(r.label)}</a></li>`).join("")}</ul></nav>`
@@ -129,8 +143,9 @@ function renderStaticBody(route: RouteContent): string {
     ? `<nav aria-label="References"><ul>${route.outbound.map((o) => `<li><a href="${o.href}"${o.rel ? ` rel="${o.rel}"` : ""}${o.href.startsWith("http") ? ' target="_blank"' : ""}>${esc(o.label)}</a></li>`).join("")}</ul></nav>`
     : "";
   const aff = `<p><a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer">Try Hostinger — fast hosting from $2.99/mo</a></p>`;
-  return `<main><h1>${esc(route.h1)}</h1><p>${esc(route.intro)}</p>${quickAnswer}${geo}${keyPoints}${sections}${tables}${useCases}${trouble}${faqs}${aff}${related}${outbound}</main>`;
+  return `<main><h1>${esc(route.h1)}</h1><p id="speakable-intro">${esc(route.intro)}</p>${quickAnswer}${geo}${takeaways}${keyPoints}${sections}${tables}${useCases}${trouble}${errors}${faqs}${summary}${aff}${related}${outbound}</main>`;
 }
+
 
 function rewriteForRoute(route: RouteContent): string {
   const url = `${BASE_URL}${route.path === "/" ? "/" : route.path}`;

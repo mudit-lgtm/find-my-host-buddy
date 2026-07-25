@@ -56,6 +56,11 @@ export function SeoHead({ route }: SeoHeadProps) {
     inLanguage: "en",
     isAccessibleForFree: true,
     image: `${BASE_URL}/og-image.png`,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: route.faqs.length > 0 ? ["#speakable-intro", "#faq"] : ["#speakable-intro"],
+    },
+
     publisher: {
       "@type": "Organization",
       name: "Site Host Finder",
