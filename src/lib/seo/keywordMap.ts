@@ -103,7 +103,7 @@ const SSL_LABS = { label: "SSL Labs — Server Test", href: "https://www.ssllabs
 export const HOME_ROUTE: RouteContent = {
   path: "/",
   title: "Check Host — Free Host Checker: Find Who Hosts Any Website",
-  description: "✅ Free Host Checker — paste a domain to instantly check host, find website host, hosting provider, IP, DNS & WHOIS. No signup, unlimited lookups, 3-second results.",
+  description: "Free host checker — paste any domain to instantly find its hosting provider, IP address, server location, DNS records and WHOIS data. No signup needed.",
   h1: "Host Checker — Check Host & Find Who Is Hosting Any Website",
   intro: "Free host checker (a.k.a. checkhost / hostchecker / check-host) that finds who hosts any website in seconds. Paste a domain to check host, find the hosting provider, server IP, server location, nameservers, DNS records, and WHOIS data — no signup, unlimited lookups, accurate worldwide.",
   keywords: [
