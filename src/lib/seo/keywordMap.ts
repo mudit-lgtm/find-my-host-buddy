@@ -1,8 +1,11 @@
 // Single source of truth for SEO content across all routes.
 // Used by: page components (titles/H1/FAQ/tables), sitemap generator, prerender script, and SEO audit.
 
+import { ROUTE_EXTRAS } from "./toolExtras";
+
 export const BASE_URL = "https://sitehostfinder.online";
 export const HOSTINGER_REF = "/go/hostinger"; // cloaked affiliate
+
 
 export interface FAQ {
   q: string;
@@ -1011,7 +1014,17 @@ export const POLICY_ROUTES: RouteContent[] = [
   },
 ];
 
+// Merge AEO enrichment blocks (key takeaways / common errors / summary) into routes.
+for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
+  const extras = ROUTE_EXTRAS[route.path];
+  if (!extras) continue;
+  route.keyTakeaways = extras.keyTakeaways;
+  route.commonErrors = extras.commonErrors;
+  route.summary = extras.summary;
+}
+
 export const ALL_ROUTES: RouteContent[] = [
+
   HOME_ROUTE,
   ...TOOL_ROUTES,
   ...GUIDE_ROUTES,
