@@ -133,6 +133,26 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           )}
         </section>
 
+        {/* KEY TAKEAWAYS — AEO answer block right under the tool */}
+        {route.keyTakeaways && route.keyTakeaways.length > 0 && (
+          <section id="key-takeaways" className="container max-w-3xl mx-auto px-4 pb-4">
+            <div className="rounded-xl border border-primary/20 bg-primary/[0.04] p-4 sm:p-5">
+              <h2 className="font-display font-bold text-foreground text-base sm:text-lg mb-3">
+                Key takeaways
+              </h2>
+              <ul className="space-y-2 text-sm sm:text-base text-foreground/90">
+                {route.keyTakeaways.map((k) => (
+                  <li key={k} className="flex gap-2">
+                    <span aria-hidden className="text-primary font-bold mt-0.5">✓</span>
+                    <span>{highlightKeywords(k, route.keywords)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
+
+
         <div className="container max-w-3xl mx-auto px-4">
           <AdsterraNative />
         </div>
@@ -298,7 +318,17 @@ export default function ToolPage({ route }: { route: RouteContent }) {
             </ul>
           </section>
         )}
+
+        {route.summary && (
+          <section id="summary" className="container max-w-3xl mx-auto px-4 py-10 border-t">
+            <h2 className="font-display text-xl font-bold mb-3">Summary</h2>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              {highlightKeywords(route.summary, route.keywords)}
+            </p>
+          </section>
+        )}
       </main>
+
 
       <Footer />
       <StickyMobileAd />
