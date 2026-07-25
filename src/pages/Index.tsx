@@ -41,9 +41,10 @@ const Index = () => {
               Find out who is hosting{" "}
               <span className="text-gradient">any website</span>
             </h1>
-            <p className="mt-4 text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl">
-              Free host checker — paste a domain to instantly find the hosting provider, IP, server location, DNS records & WHOIS.
+            <p id="speakable-intro" className="mt-4 text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl">
+              Free host checker — paste a domain to instantly find the hosting provider, IP, server location, DNS records &amp; WHOIS.
             </p>
+
             <div className="mt-8 w-full flex justify-center">
               <SearchBar />
             </div>

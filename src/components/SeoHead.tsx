@@ -65,13 +65,13 @@ export function SeoHead({ route }: SeoHeadProps) {
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "All",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      areaServed: "Worldwide",
       aggregateRating: {
         "@type": "AggregateRating",
         ratingValue: "4.8",
         ratingCount: "1284",
       },
     }),
+
     ...(route.schemaType === "Article" && {
       author: { "@type": "Organization", name: "Site Host Finder" },
       datePublished: "2026-01-01",
