@@ -1,8 +1,6 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SeoHead } from "@/components/SeoHead";
-import { StickyMobileAd } from "@/components/StickyMobileAd";
-import { AdsterraNative } from "@/components/AdsterraNative";
 import type { RouteContent } from "@/lib/seo/keywordMap";
 import { ChevronRight } from "lucide-react";
 
@@ -53,10 +51,6 @@ export default function GuidePage({ route }: { route: RouteContent }) {
         <article className="container max-w-3xl mx-auto px-4 py-10">
           <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight">{route.h1}</h1>
           <p className="mt-4 text-lg text-muted-foreground leading-relaxed">{route.intro}</p>
-
-          <div className="mt-6">
-            <AdsterraNative />
-          </div>
 
           <div className="mt-8 space-y-6">
             {route.sections.map((s) => (
@@ -124,7 +118,6 @@ export default function GuidePage({ route }: { route: RouteContent }) {
         </article>
       </main>
       <Footer />
-      <StickyMobileAd />
     </div>
   );
 }

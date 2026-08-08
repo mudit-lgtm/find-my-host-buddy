@@ -6,8 +6,6 @@ import { IsItUpTool } from "@/components/tools/IsItUpTool";
 import { WhatIsMyIPTool } from "@/components/tools/WhatIsMyIPTool";
 import { PortCheckerTool } from "@/components/tools/PortCheckerTool";
 import { CompareSection } from "@/components/CompareSection";
-import { StickyMobileAd } from "@/components/StickyMobileAd";
-import { AdsterraNative } from "@/components/AdsterraNative";
 import type { RouteContent } from "@/lib/seo/keywordMap";
 import { highlightKeywords } from "@/lib/seo/highlightKeywords";
 import { ChevronRight, Sparkles } from "lucide-react";
@@ -152,10 +150,6 @@ export default function ToolPage({ route }: { route: RouteContent }) {
           </section>
         )}
 
-
-        <div className="container max-w-3xl mx-auto px-4">
-          <AdsterraNative />
-        </div>
 
         {/* KEY POINTS — what the page covers */}
         {keyPoints.length > 0 && (
@@ -331,7 +325,6 @@ export default function ToolPage({ route }: { route: RouteContent }) {
 
 
       <Footer />
-      <StickyMobileAd />
     </div>
   );
 }

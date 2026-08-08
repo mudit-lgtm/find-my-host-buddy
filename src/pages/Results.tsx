@@ -12,9 +12,6 @@ import { OverviewSection } from "@/components/results/OverviewSection";
 import { SecurityPerformanceSection } from "@/components/results/SecurityPerformanceSection";
 import { WhoisSection } from "@/components/results/WhoisSection";
 import { DnsRecordsSection } from "@/components/results/DnsRecordsSection";
-import { AdsterraSidebar } from "@/components/AdsterraSidebar";
-import { AdsterraNative } from "@/components/AdsterraNative";
-import { StickyMobileAd } from "@/components/StickyMobileAd";
 import type { HostingResult } from "@/lib/types";
 
 import { normalizeView, visibleSections, VIEW_TITLES, type ViewKind } from "@/lib/resultsView";
@@ -118,13 +115,6 @@ export default function Results() {
           </div>
         </section>
 
-        {/* Native banner below summary */}
-        {data && (
-          <div className="container max-w-5xl mx-auto px-4 pt-4">
-            <AdsterraNative />
-          </div>
-        )}
-
         {/* Results with optional sidebar ad on xl screens */}
         <section className="container max-w-7xl mx-auto px-4 py-6 sm:py-10 flex gap-6">
           <div className="flex-1 min-w-0">
@@ -209,14 +199,10 @@ export default function Results() {
             )}
 
           </div>
-
-          {/* Sidebar ad: only on xl */}
-          <AdsterraSidebar />
         </section>
       </main>
 
       <Footer />
-      <StickyMobileAd />
     </div>
   );
 }

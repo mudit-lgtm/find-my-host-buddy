@@ -13,6 +13,23 @@ export default function PolicyPage({ route }: { route: RouteContent }) {
         <p className="mt-4 text-muted-foreground leading-relaxed">{route.intro}</p>
         <p className="mt-2 text-xs text-muted-foreground">Last updated: April 2026</p>
 
+        {route.path === "/contact" && (
+          <section className="mt-8 rounded-lg border bg-card p-6">
+            <h2 className="font-display text-xl font-bold">Email us directly</h2>
+            <p className="mt-2 text-muted-foreground leading-relaxed">
+              Every message goes to a monitored inbox and we reply within 24–48 hours.
+            </p>
+            <a
+              href="mailto:contact@sitehostfinder.online?subject=Site%20Host%20Finder%20enquiry"
+              className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              contact@sitehostfinder.online
+            </a>
+          </section>
+        )}
+
+
+
         <div className="mt-8 space-y-6">
           {route.sections.map((s) => (
             <section key={s.heading}>
