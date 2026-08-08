@@ -5,9 +5,6 @@ import { FAQSection } from "@/components/FAQSection";
 import { HowToSection } from "@/components/HowToSection";
 import { TrustFactors } from "@/components/TrustFactors";
 import { SEOContent } from "@/components/SEOContent";
-import { AdsterraAd } from "@/components/AdsterraAd";
-import { AdsterraNative } from "@/components/AdsterraNative";
-import { StickyMobileAd } from "@/components/StickyMobileAd";
 import { TOOL_ROUTES, HOME_ROUTE } from "@/lib/seo/keywordMap";
 import {
   Server, Globe, Activity, Wifi, Shield, ArrowRightLeft,
@@ -56,10 +53,6 @@ const Index = () => {
             >
               🚀 Need fast hosting? <span className="font-semibold text-primary">Try Hostinger →</span>
             </a>
-
-            <div className="mt-8 w-full max-w-3xl">
-              <AdsterraNative />
-            </div>
           </div>
         </section>
 
@@ -120,23 +113,14 @@ const Index = () => {
           </div>
         </section>
 
-        <div className="hidden md:flex justify-center py-6 border-t">
-          <AdsterraAd adKey="996d0263af42d6d1053ccaacfb8d3788" width={728} height={90} />
-        </div>
-
         <div className="border-t">
           <FAQSection />
-        </div>
-
-        <div className="hidden md:flex justify-center py-4 border-t">
-          <AdsterraAd adKey="759ffd17453099550f27812f849cce0f" width={468} height={60} />
         </div>
 
         <SEOContent />
       </main>
 
       <Footer />
-      <StickyMobileAd />
     </div>
   );
 };
