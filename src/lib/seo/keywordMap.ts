@@ -201,8 +201,47 @@ const baseRelatedTools = [
   { label: "Domain Compare", href: "/tools/domain-compare" },
 ];
 
-const related = (excludePath: string) =>
-  baseRelatedTools.filter((t) => t.href !== excludePath).slice(0, 5);
+// Contextual guide links per tool page (crawl paths + topical relevance).
+const TOOL_GUIDE_LINKS: Record<string, { label: string; href: string }[]> = {
+  "/tools/dns-lookup": [
+    { label: "Guide: How to find where a website is hosted", href: "/guides/how-to-find-where-a-website-is-hosted" },
+    { label: "Guide: What is web hosting?", href: "/guides/what-is-web-hosting" },
+  ],
+  "/tools/whois-lookup": [
+    { label: "Guide: How to find where a website is hosted", href: "/guides/how-to-find-where-a-website-is-hosted" },
+  ],
+  "/tools/ip-checker": [
+    { label: "Guide: How to find where a website is hosted", href: "/guides/how-to-find-where-a-website-is-hosted" },
+    { label: "Guide: Shared vs VPS vs cloud hosting", href: "/guides/shared-vs-vps-vs-cloud-hosting" },
+  ],
+  "/tools/reverse-ip-lookup": [
+    { label: "Guide: Shared vs VPS vs cloud hosting", href: "/guides/shared-vs-vps-vs-cloud-hosting" },
+  ],
+  "/tools/ssl-checker": [
+    { label: "Guide: What is web hosting?", href: "/guides/what-is-web-hosting" },
+  ],
+  "/tools/http-headers": [
+    { label: "Guide: How to find where a website is hosted", href: "/guides/how-to-find-where-a-website-is-hosted" },
+  ],
+  "/tools/cms-detector": [
+    { label: "Guide: What is web hosting?", href: "/guides/what-is-web-hosting" },
+    { label: "Guide: Best web hosting for beginners", href: "/guides/best-web-hosting-for-beginners" },
+  ],
+  "/tools/website-down-checker": [
+    { label: "Guide: Shared vs VPS vs cloud hosting", href: "/guides/shared-vs-vps-vs-cloud-hosting" },
+  ],
+  "/tools/port-checker": [
+    { label: "Guide: Shared vs VPS vs cloud hosting", href: "/guides/shared-vs-vps-vs-cloud-hosting" },
+  ],
+  "/tools/domain-compare": [
+    { label: "Guide: Best web hosting for beginners", href: "/guides/best-web-hosting-for-beginners" },
+  ],
+};
+
+const related = (excludePath: string) => [
+  ...baseRelatedTools.filter((t) => t.href !== excludePath).slice(0, 4),
+  ...(TOOL_GUIDE_LINKS[excludePath] || []),
+];
 
 export const TOOL_ROUTES: RouteContent[] = [
   {
@@ -891,10 +930,10 @@ export const POLICY_ROUTES: RouteContent[] = [
     keywords: ["privacy policy"],
     sections: [
       { heading: "Information we collect", body: "We do not require accounts. Domain lookups are processed in real time and not stored against your identity. Server logs may temporarily contain IP addresses for abuse prevention (deleted within 30 days). Our analytics provider (Google Analytics 4) sets cookies." },
-      { heading: "Advertising", body: "We display ads via Google AdSense and Adsterra. These networks use cookies for ad personalisation. You can opt out via Google's Ads Settings (adssettings.google.com) and aboutads.info." },
+      { heading: "Advertising", body: "We display ads via Google AdSense. Google and its partners may use cookies to serve and measure ads. You can manage or opt out of personalised advertising via Google Ads Settings (adssettings.google.com) and aboutads.info. We do not use any other advertising network." },
       { heading: "Cookies", body: "Cookies are used for analytics and advertising. You may disable cookies in your browser — the tools still work without them." },
-      { heading: "Third-party services", body: "Google AdSense, Adsterra, Google Analytics, and our backend infrastructure provider. Each has its own privacy policy. We do not sell your data." },
-      { heading: "Your rights", body: "EU/UK/California residents may request access, deletion, or portability of any personal data we hold. Email contact@sitehostfinder.com." },
+      { heading: "Third-party services", body: "Google AdSense, Google Analytics, our backend infrastructure provider, and the public data sources our tools query (DNS resolvers, WHOIS registries, IP registries and the target website itself). Each has its own privacy policy. We never sell your data." },
+      { heading: "Your rights", body: "EU/UK/California residents may request access, deletion, or portability of any personal data we hold. Email contact@sitehostfinder.online." },
       { heading: "Changes", body: "We may update this policy. Material changes will be announced on this page with a revised date." },
     ],
     faqs: [],
@@ -974,8 +1013,8 @@ export const POLICY_ROUTES: RouteContent[] = [
     sections: [
       { heading: "Our mission", body: "Make hosting intelligence free, fast, and accurate. Most existing tools are slow, paywalled, or rate-limited. We are not." },
       { heading: "What we offer", body: "Free webmaster tools: master host checker (home page), DNS lookup, WHOIS lookup, IP checker, reverse IP, SSL checker, HTTP header inspector, CMS detector, website down checker, port checker, and domain compare. Plus guides explaining everything." },
-      { heading: "How we fund this", body: "Advertising (Google AdSense, Adsterra) and Hostinger affiliate referrals via /go/hostinger. We never sell user data. Tools stay free forever." },
-      { heading: "Get in touch", body: "Email contact@sitehostfinder.com for feedback, bug reports, partnership requests, or press inquiries." },
+      { heading: "How we fund this", body: "Advertising (Google AdSense) and Hostinger affiliate referrals via /go/hostinger. We never sell user data. Tools stay free forever." },
+      { heading: "Get in touch", body: "Email contact@sitehostfinder.online for feedback, bug reports, partnership requests, or press inquiries." },
     ],
     faqs: [],
     related: [
@@ -997,7 +1036,7 @@ export const POLICY_ROUTES: RouteContent[] = [
     intro: "Questions, feedback, bug reports, or partnership ideas? We'd love to hear from you. We typically respond within 24–48 hours.",
     keywords: ["contact site host finder"],
     sections: [
-      { heading: "Email", body: "Reach us at contact@sitehostfinder.com. For bug reports, please include the URL you were checking, your browser, and a screenshot if possible." },
+      { heading: "Email", body: "Reach us at contact@sitehostfinder.online. For bug reports, please include the URL you were checking, your browser, and a screenshot if possible." },
       { heading: "Feedback", body: "Want a new tool? Found an inaccurate hosting match? Tell us. User feedback drives our roadmap." },
       { heading: "Partnerships & press", body: "For affiliate partnerships, API access, press inquiries, or sponsorships, use the same email." },
     ],
