@@ -13,7 +13,9 @@
     { "source": "/tools/hosting-lookup", "destination": "/", "statusCode": 301 },
     { "source": "/tools/find-website-host", "destination": "/", "statusCode": 301 },
     { "source": "/tools/where-is-website-hosted", "destination": "/", "statusCode": 301 },
-    { "source": "/tools/who-is-hosting", "destination": "/", "statusCode": 301 }
+    { "source": "/tools/who-is-hosting", "destination": "/", "statusCode": 301 },
+    { "source": "/privacy-policy", "destination": "/privacy", "statusCode": 301 },
+    { "source": "/terms-of-service", "destination": "/terms", "statusCode": 301 }
   ],
   "rewrites": [
     { "source": "/results/(.*)", "destination": "/index.html" },
