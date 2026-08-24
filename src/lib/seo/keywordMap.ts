@@ -2,6 +2,8 @@
 // Used by: page components (titles/H1/FAQ/tables), sitemap generator, prerender script, and SEO audit.
 
 import { ROUTE_EXTRAS } from "./toolExtras";
+import { DEPTH_CONTENT } from "./depthContent";
+
 
 export const BASE_URL = "https://sitehostfinder.online";
 export const HOSTINGER_REF = "/go/hostinger"; // cloaked affiliate
