@@ -1067,6 +1067,27 @@ for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
   route.summary = extras.summary;
 }
 
+// Append reference-guide depth content (sections + long-tail FAQs) below existing copy.
+for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
+  const depth = DEPTH_CONTENT[route.path];
+  if (!depth) continue;
+  const seenHeadings = new Set(route.sections.map((s) => s.heading.toLowerCase()));
+  for (const s of depth.sections) {
+    if (!seenHeadings.has(s.heading.toLowerCase())) {
+      route.sections.push(s);
+      seenHeadings.add(s.heading.toLowerCase());
+    }
+  }
+  const seenQ = new Set(route.faqs.map((f) => f.q.toLowerCase()));
+  for (const f of depth.faqs || []) {
+    if (!seenQ.has(f.q.toLowerCase())) {
+      route.faqs.push(f);
+      seenQ.add(f.q.toLowerCase());
+    }
+  }
+}
+
+
 export const ALL_ROUTES: RouteContent[] = [
 
   HOME_ROUTE,
