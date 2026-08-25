@@ -1154,7 +1154,7 @@ for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
   }
   const score = (f: FAQ) => {
     const q = f.q.toLowerCase();
-    return kw.reduce((n, k) => (q.includes(k) ? n + 2 : 0) + n * 0, 0) + (q.length < 70 ? 1 : 0);
+    return kw.reduce((n, k) => n + (q.includes(k) ? 2 : 0), 0) + (q.length < 70 ? 1 : 0);
   };
   const cap = FAQ_CAP[route.path] ?? DEFAULT_FAQ_CAP;
   route.faqs = uniqueFaqs
