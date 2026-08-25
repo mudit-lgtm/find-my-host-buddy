@@ -172,11 +172,18 @@ function rewriteForRoute(route: RouteContent): string {
   return html;
 }
 
+function proseWords(route: RouteContent): number {
+  const text = [route.intro, ...route.sections.map((s) => `${s.body} ${(s.bullets || []).join(" ")}`)].join(" ");
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
 let written = 0;
 for (const route of ALL_ROUTES) {
   if (route.path === "/") continue;
   const outDir = resolve(DIST, route.path.replace(/^\//, ""));
   mkdirSync(outDir, { recursive: true });
+  const pw = proseWords(route);
+  if (pw > 1100) console.warn(`prerender: WARNING ${route.path} has ${pw} prose words (>1100) — consider trimming`);
   writeFileSync(resolve(outDir, "index.html"), rewriteForRoute(route), "utf8");
   written++;
 }

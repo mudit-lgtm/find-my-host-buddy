@@ -1089,6 +1089,87 @@ for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
   }
 }
 
+// ---------- FINAL NORMALIZATION PASS ----------
+// Three content layers (base literals -> toolContent.json -> DEPTH_CONTENT) were
+// merged additively, which produced near-duplicate sections and 16-25 FAQs per
+// tool page. This pass removes semantic duplicates and caps length so each page
+// reads like a tool + tight reference guide, not a blog essay.
+
+const STOP = new Set(["the","a","an","of","for","to","and","in","is","how","what","why","your","you","this","it","on","with","does","do","are","can","my","use","using","when"]);
+const tokens = (s: string) =>
+  new Set(
+    s.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w && !STOP.has(w)),
+  );
+
+/** Jaccard overlap between two strings' significant tokens. */
+function similarity(a: string, b: string): number {
+  const ta = tokens(a);
+  const tb = tokens(b);
+  if (!ta.size || !tb.size) return 0;
+  let shared = 0;
+  ta.forEach((t) => { if (tb.has(t)) shared++; });
+  return shared / Math.min(ta.size, tb.size);
+}
+
+const wordCount = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
+
+const MAX_SECTIONS = 7;
+const MAX_PROSE_WORDS = 1100;
+/** Pages whose GSC intent is short/transactional keep a tighter FAQ block. */
+const FAQ_CAP: Record<string, number> = {
+  "/": 6,
+  "/tools/cms-detector": 6,
+  "/tools/whois-lookup": 6,
+  "/tools/port-checker": 6,
+};
+const DEFAULT_FAQ_CAP = 8;
+
+for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
+  // 1. Sections — drop near-duplicate headings or bodies, keep first (best) version.
+  const keptSections: RichSection[] = [];
+  for (const s of route.sections) {
+    const dup = keptSections.some(
+      (k) => similarity(k.heading, s.heading) >= 0.6 || similarity(k.body, s.body) >= 0.55,
+    );
+    if (!dup) keptSections.push(s);
+  }
+
+  // 2. Cap section count and total prose length.
+  const capped: RichSection[] = [];
+  let prose = wordCount(route.intro);
+  for (const s of keptSections) {
+    if (capped.length >= MAX_SECTIONS) break;
+    const w = wordCount(s.body) + (s.bullets || []).reduce((n, b) => n + wordCount(b), 0);
+    if (capped.length >= 3 && prose + w > MAX_PROSE_WORDS) continue;
+    capped.push(s);
+    prose += w;
+  }
+  route.sections = capped;
+
+  // 3. FAQs — drop semantic duplicates, then rank by keyword relevance and cap.
+  const kw = route.keywords.map((k) => k.toLowerCase());
+  const uniqueFaqs: FAQ[] = [];
+  for (const f of route.faqs) {
+    if (!uniqueFaqs.some((k) => similarity(k.q, f.q) >= 0.7)) uniqueFaqs.push(f);
+  }
+  const score = (f: FAQ) => {
+    const q = f.q.toLowerCase();
+    return kw.reduce((n, k) => n + (q.includes(k) ? 2 : 0), 0) + (q.length < 70 ? 1 : 0);
+  };
+  const cap = FAQ_CAP[route.path] ?? DEFAULT_FAQ_CAP;
+  route.faqs = uniqueFaqs
+    .map((f, i) => ({ f, i, s: score(f) }))
+    .sort((a, b) => b.s - a.s || a.i - b.i)
+    .slice(0, cap)
+    .map((x) => x.f);
+
+  // 4. Trim overlapping long-form blocks that repeat the sections.
+  if (route.useCases && route.useCases.length > 4) route.useCases = route.useCases.slice(0, 4);
+  if (route.troubleshooting && route.troubleshooting.length > 4) route.troubleshooting = route.troubleshooting.slice(0, 4);
+}
+
+
+
 
 export const ALL_ROUTES: RouteContent[] = [
 
