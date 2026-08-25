@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "postbuild": "tsx scripts/prerender.ts && tsx scripts/generate-sitemap.ts",
+    "build": "vite build && tsx scripts/prerender.ts && tsx scripts/generate-sitemap.ts",
     "build:dev": "vite build --mode development",
     "seo:audit": "tsx scripts/seo-audit.ts",
     "seo:validate": "tsx scripts/validate-seo-assets.ts",
