@@ -20,6 +20,7 @@ const resourceLinks = GUIDE_ROUTES.slice(0, 3).map((r) => ({
 const legalLinks = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms of Service", href: "/terms" },
+  { label: "Disclaimer", href: "/disclaimer" },
 ];
 
 function Column({ title, links }: { title: string; links: { label: string; href: string }[] }) {
