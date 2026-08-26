@@ -1075,7 +1075,9 @@ for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
 
 /** Trim prose to whole sentences within a word budget. */
 function trimToWords(body: string, max: number): string {
-  const sentences = body.match(/[^.!?]+[.!?]+(\s|$)/g) || [body];
+  // Split only on sentence ends followed by a space + capital letter, so
+  // "wix.com" or "window.SQUARESPACE_CONTEXT" never break a sentence apart.
+  const sentences = body.split(/(?<=[.!?])\s+(?=[A-Z0-9"'])/);
   const out: string[] = [];
   let n = 0;
   for (const s of sentences) {
