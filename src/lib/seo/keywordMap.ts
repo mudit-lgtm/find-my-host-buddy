@@ -722,13 +722,16 @@ type ToolContent = {
 const toolContent = toolContentRaw as Record<string, ToolContent>;
 const slugFromPath = (p: string) => p.replace(/^\/tools\//, "");
 
+// NOTE: `sections` from toolContent.json is deliberately NOT used. Those were
+// long essay-style blocks that duplicated each other and blew past the prose
+// budget of the pages actually ranking in this niche (300-500 words). Tool page
+// prose now comes from DEPTH_CONTENT ("How it works" + "How to read results").
 for (const route of TOOL_ROUTES) {
   const rich = toolContent[slugFromPath(route.path)];
   if (!rich) continue;
   route.quickAnswer = rich.quickAnswer;
   route.geoNote = rich.geoNote;
   route.keyPoints = rich.keyPoints;
-  route.sections = rich.sections;        // replace with the 7-9 rich sections
   route.useCases = rich.useCases;
   route.troubleshooting = rich.troubleshooting;
   // Merge FAQs: keep originals first, append AI-generated, dedupe by question.
@@ -740,6 +743,7 @@ for (const route of TOOL_ROUTES) {
     }
   }
 }
+
 
 
 
