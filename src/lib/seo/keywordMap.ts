@@ -1073,17 +1073,43 @@ for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
   route.summary = extras.summary;
 }
 
-// Append reference-guide depth content (sections + long-tail FAQs) below existing copy.
+/** Trim prose to whole sentences within a word budget. */
+function trimToWords(body: string, max: number): string {
+  const sentences = body.match(/[^.!?]+[.!?]+(\s|$)/g) || [body];
+  const out: string[] = [];
+  let n = 0;
+  for (const s of sentences) {
+    const w = s.trim().split(/\s+/).length;
+    if (out.length && n + w > max) break;
+    out.push(s.trim());
+    n += w;
+  }
+  return out.join(" ");
+}
+
+// Homepage: append depth sections. Tool pages: prose is REPLACED by exactly two
+// short blocks — "How it works" and "How to read your results" — keeping total
+// tool-page prose in the 300-500 word range that ranking competitors use.
 for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
   const depth = DEPTH_CONTENT[route.path];
   if (!depth) continue;
-  const seenHeadings = new Set(route.sections.map((s) => s.heading.toLowerCase()));
-  for (const s of depth.sections) {
-    if (!seenHeadings.has(s.heading.toLowerCase())) {
-      route.sections.push(s);
-      seenHeadings.add(s.heading.toLowerCase());
+
+  if (route.category === "tool") {
+    const howWorks = depth.sections.find((s) => /works|compares/i.test(s.heading));
+    const howRead = depth.sections.find((s) => /^how to read/i.test(s.heading));
+    route.sections = [howWorks, howRead]
+      .filter((s): s is RichSection => Boolean(s))
+      .map((s) => ({ ...s, body: trimToWords(s.body, 80), bullets: s.bullets }));
+  } else {
+    const seenHeadings = new Set(route.sections.map((s) => s.heading.toLowerCase()));
+    for (const s of depth.sections) {
+      if (!seenHeadings.has(s.heading.toLowerCase())) {
+        route.sections.push(s);
+        seenHeadings.add(s.heading.toLowerCase());
+      }
     }
   }
+
   const seenQ = new Set(route.faqs.map((f) => f.q.toLowerCase()));
   for (const f of depth.faqs || []) {
     if (!seenQ.has(f.q.toLowerCase())) {
