@@ -176,7 +176,7 @@ export default function ToolPage({ route }: { route: RouteContent }) {
         {/* LONG-FORM CONTENT */}
         <section className="container max-w-3xl mx-auto px-4 py-8 space-y-10">
           {route.sections.map((s) => {
-            const sentences = s.body.match(/[^.!?]+[.!?]+(\s|$)/g)?.map((x) => x.trim()).filter(Boolean) || [s.body];
+            const sentences = s.body.split(/(?<=[.!?])\s+(?=[A-Z0-9"'])/).map((x) => x.trim()).filter(Boolean);
             const chunks: string[] = [];
             for (let i = 0; i < sentences.length; i += 2) {
               chunks.push(sentences.slice(i, i + 2).join(" "));
