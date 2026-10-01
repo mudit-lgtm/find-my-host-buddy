@@ -74,7 +74,7 @@ export interface RouteContent {
   category: "tool" | "guide" | "policy" | "home";
   changefreq: "weekly" | "monthly" | "yearly";
   priority: string;
-  schemaType?: "SoftwareApplication" | "Article" | "HowTo" | "WebPage";
+  schemaType?: "WebApplication" | "Article" | "HowTo" | "WebPage";
   toolComponent?:
     | "Hosting"          // master hosting checker (SearchBar -> /results)
     | "DnsLookup"
@@ -183,7 +183,7 @@ export const HOME_ROUTE: RouteContent = {
   category: "home",
   changefreq: "weekly",
   priority: "1.0",
-  schemaType: "SoftwareApplication",
+  schemaType: "WebApplication",
   toolComponent: "Hosting",
 };
 
@@ -287,7 +287,7 @@ export const TOOL_ROUTES: RouteContent[] = [
     category: "tool",
     changefreq: "weekly",
     priority: "0.9",
-    schemaType: "SoftwareApplication",
+    schemaType: "WebApplication",
     toolComponent: "DnsLookup",
   },
   {
@@ -330,7 +330,7 @@ export const TOOL_ROUTES: RouteContent[] = [
     category: "tool",
     changefreq: "weekly",
     priority: "0.9",
-    schemaType: "SoftwareApplication",
+    schemaType: "WebApplication",
     toolComponent: "WhoisLookup",
   },
   {
@@ -371,7 +371,7 @@ export const TOOL_ROUTES: RouteContent[] = [
     category: "tool",
     changefreq: "weekly",
     priority: "0.9",
-    schemaType: "SoftwareApplication",
+    schemaType: "WebApplication",
     toolComponent: "IpChecker",
   },
   {
@@ -410,7 +410,7 @@ export const TOOL_ROUTES: RouteContent[] = [
     category: "tool",
     changefreq: "weekly",
     priority: "0.8",
-    schemaType: "SoftwareApplication",
+    schemaType: "WebApplication",
     toolComponent: "ReverseIpLookup",
   },
   {
@@ -451,7 +451,7 @@ export const TOOL_ROUTES: RouteContent[] = [
     category: "tool",
     changefreq: "weekly",
     priority: "0.9",
-    schemaType: "SoftwareApplication",
+    schemaType: "WebApplication",
     toolComponent: "SslChecker",
   },
   {
@@ -492,7 +492,7 @@ export const TOOL_ROUTES: RouteContent[] = [
     category: "tool",
     changefreq: "weekly",
     priority: "0.8",
-    schemaType: "SoftwareApplication",
+    schemaType: "WebApplication",
     toolComponent: "HttpHeaders",
   },
   {
@@ -575,7 +575,7 @@ export const TOOL_ROUTES: RouteContent[] = [
     category: "tool",
     changefreq: "weekly",
     priority: "0.9",
-    schemaType: "SoftwareApplication",
+    schemaType: "WebApplication",
     toolComponent: "CmsDetector",
   },
   {
@@ -617,7 +617,7 @@ export const TOOL_ROUTES: RouteContent[] = [
     category: "tool",
     changefreq: "weekly",
     priority: "0.9",
-    schemaType: "SoftwareApplication",
+    schemaType: "WebApplication",
     toolComponent: "IsItUp",
   },
   {
@@ -661,7 +661,7 @@ export const TOOL_ROUTES: RouteContent[] = [
     category: "tool",
     changefreq: "weekly",
     priority: "0.8",
-    schemaType: "SoftwareApplication",
+    schemaType: "WebApplication",
     toolComponent: "PortChecker",
   },
   {
@@ -701,7 +701,7 @@ export const TOOL_ROUTES: RouteContent[] = [
     category: "tool",
     changefreq: "weekly",
     priority: "0.9",
-    schemaType: "SoftwareApplication",
+    schemaType: "WebApplication",
     toolComponent: "DomainCompare",
   },
 ];
@@ -1147,14 +1147,11 @@ const wordCount = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
 
 const MAX_SECTIONS = 7;
 const MAX_PROSE_WORDS = 1100;
-/** Pages whose GSC intent is short/transactional keep a tighter FAQ block. */
+/** Tool pages cap at 4 FAQs (utility-first structure); homepage keeps 6. */
 const FAQ_CAP: Record<string, number> = {
   "/": 6,
-  "/tools/cms-detector": 6,
-  "/tools/whois-lookup": 6,
-  "/tools/port-checker": 6,
 };
-const DEFAULT_FAQ_CAP = 8;
+const DEFAULT_FAQ_CAP = 4;
 
 for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
   // 1. Sections — drop near-duplicate headings or bodies, keep first (best) version.

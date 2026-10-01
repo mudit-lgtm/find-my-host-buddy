@@ -292,7 +292,7 @@ async function fetchSiteData(domain: string): Promise<{
       const resp = await fetch(`${protocol}://${domain}`, {
         method: "GET",
         redirect: "follow",
-        signal: AbortSignal.timeout(12000),
+        signal: AbortSignal.timeout(10000),
         headers: { "User-Agent": "SiteHostFinderBot/1.0" },
       });
       const responseTime = Date.now() - start;
@@ -339,14 +339,61 @@ function extractFavicon(domain: string, body: string): string {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
 }
 
+// Simple per-IP rate limit (per isolate): 30 requests per minute.
+const RATE_LIMIT = 30;
+const RATE_WINDOW_MS = 60_000;
+const hits = new Map<string, { count: number; reset: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = hits.get(ip);
+  if (!entry || now > entry.reset) {
+    hits.set(ip, { count: 1, reset: now + RATE_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_LIMIT;
+}
+
+/** Reject localhost and private/internal IP ranges (SSRF protection). */
+function isPrivateOrLocal(host: string): boolean {
+  const h = host.toLowerCase().replace(/^\[|\]$/g, "");
+  if (
+    h === "localhost" || h.endsWith(".local") || h.endsWith(".internal") ||
+    h.endsWith(".localhost") || h === "::1" || h === "::" ||
+    h.startsWith("fe80:") || h.startsWith("fc") || h.startsWith("fd")
+  ) return true;
+  const m = h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (!m) return false;
+  const a = Number(m[1]);
+  const b = Number(m[2]);
+  return (
+    a === 0 || a === 10 || a === 127 ||
+    (a === 192 && b === 168) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 169 && b === 254) ||
+    (a >= 224) // multicast/reserved
+  );
+}
+
+const DOMAIN_RE = /^(?!-)[a-z0-9-]{1,63}(?<!-)(\.(?!-)[a-z0-9-]{1,63}(?<!-))+$/i;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (isRateLimited(clientIp)) {
+    return new Response(JSON.stringify({ error: "Too many requests. Please wait a minute and try again." }), {
+      status: 429,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const { domain } = await req.json();
-    if (!domain || typeof domain !== "string") {
+    if (!domain || typeof domain !== "string" || domain.length > 253) {
       return new Response(JSON.stringify({ error: "Invalid domain" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -354,6 +401,13 @@ serve(async (req) => {
     }
 
     const cleanDomain = domain.replace(/^(https?:\/\/)?(www\.)?/, "").split("/")[0].split("?")[0];
+
+    if (!DOMAIN_RE.test(cleanDomain) || isPrivateOrLocal(cleanDomain)) {
+      return new Response(JSON.stringify({ error: "Invalid or disallowed domain." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Run all lookups in parallel — now includes TXT, AAAA, CNAME and WHOIS
     const [aRecords, aaaaRecords, nsRecords, mxRecords, txtRecords, cnameRecords, siteData, whois] = await Promise.all([

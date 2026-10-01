@@ -52,7 +52,7 @@ function buildSchemas(route: RouteContent, url: string) {
     },
   };
 
-  if (route.schemaType === "SoftwareApplication") {
+  if (route.schemaType === "WebApplication") {
     Object.assign(primary, {
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "All",
@@ -75,7 +75,7 @@ function buildSchemas(route: RouteContent, url: string) {
   }
   const blocks: unknown[] = [primary, breadcrumb];
   // Tool pages: also emit WebPage alongside SoftwareApplication for richer indexing.
-  if (route.schemaType === "SoftwareApplication" && route.category === "tool") {
+  if (route.schemaType === "WebApplication" && route.category === "tool") {
     blocks.push({
       "@context": "https://schema.org",
       "@type": "WebPage",
