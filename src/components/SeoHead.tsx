@@ -66,7 +66,7 @@ export function SeoHead({ route }: SeoHeadProps) {
       name: "Site Host Finder",
       logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` },
     },
-    ...(route.schemaType === "SoftwareApplication" && {
+    ...(route.schemaType === "WebApplication" && {
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "All",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -94,7 +94,7 @@ export function SeoHead({ route }: SeoHeadProps) {
 
   // For tool pages, also emit a WebPage schema alongside SoftwareApplication.
   const webPageSchema =
-    route.schemaType === "SoftwareApplication" && route.category === "tool"
+    route.schemaType === "WebApplication" && route.category === "tool"
       ? {
           "@context": "https://schema.org",
           "@type": "WebPage",
