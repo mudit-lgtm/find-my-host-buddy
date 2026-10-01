@@ -111,7 +111,6 @@ export function SeoHead({ route }: SeoHeadProps) {
     <Helmet>
       <title>{route.title}</title>
       <meta name="description" content={route.description} />
-      <meta name="keywords" content={route.keywords.join(", ")} />
       <link rel="canonical" href={url} />
       <meta property="og:title" content={route.title} />
       <meta property="og:description" content={route.description} />
