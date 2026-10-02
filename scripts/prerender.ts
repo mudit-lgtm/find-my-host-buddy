@@ -162,7 +162,7 @@ function rewriteForRoute(route: RouteContent): string {
   html = html.replace(/<meta name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${esc(route.description)}" />`);
 
   if (route.noindex) {
-    html = html.replace(/<\/head>/i, `    <meta name="robots" content="noindex, follow" />\n  </head>`);
+    html = html.replace(/<meta name="robots"[^>]*>/i, `<meta name="robots" content="noindex, follow" />`);
   }
 
   const schemas = buildSchemas(route, url);
