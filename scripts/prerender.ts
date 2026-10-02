@@ -57,7 +57,6 @@ function buildSchemas(route: RouteContent, url: string) {
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "All",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", ratingCount: "1284" },
     });
   }
 
@@ -143,7 +142,10 @@ function renderStaticBody(route: RouteContent): string {
     ? `<nav aria-label="References"><ul>${route.outbound.map((o) => `<li><a href="${o.href}"${o.rel ? ` rel="${o.rel}"` : ""}${o.href.startsWith("http") ? ' target="_blank"' : ""}>${esc(o.label)}</a></li>`).join("")}</ul></nav>`
     : "";
   const aff = `<p><a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer">Try Hostinger — fast hosting from $2.99/mo</a></p>`;
-  return `<main><h1>${esc(route.h1)}</h1><p id="speakable-intro">${esc(route.intro)}</p>${quickAnswer}${geo}${takeaways}${keyPoints}${sections}${tables}${useCases}${trouble}${errors}${faqs}${summary}${aff}${related}${outbound}</main>`;
+  const hostCheckerCta = route.path === "/guides/how-to-find-where-a-website-is-hosted"
+    ? `<p><a href="/"><strong>Skip the guide — use the free Host Checker tool to find any site's host in seconds →</strong></a></p>`
+    : "";
+  return `<main><h1>${esc(route.h1)}</h1><p id="speakable-intro">${esc(route.intro)}</p>${hostCheckerCta}${quickAnswer}${geo}${takeaways}${keyPoints}${sections}${tables}${useCases}${trouble}${errors}${faqs}${summary}${aff}${related}${outbound}</main>`;
 }
 
 
@@ -158,6 +160,10 @@ function rewriteForRoute(route: RouteContent): string {
   html = html.replace(/<meta property="og:url"[^>]*>/i, `<meta property="og:url" content="${url}" />`);
   html = html.replace(/<meta name="twitter:title"[^>]*>/i, `<meta name="twitter:title" content="${esc(route.title)}" />`);
   html = html.replace(/<meta name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${esc(route.description)}" />`);
+
+  if (route.noindex) {
+    html = html.replace(/<meta name="robots"[^>]*>/i, `<meta name="robots" content="noindex, follow" />`);
+  }
 
   const schemas = buildSchemas(route, url);
   html = html.replace(/<\/head>/i, `    ${schemas}\n  </head>`);
