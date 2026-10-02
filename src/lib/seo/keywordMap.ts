@@ -75,6 +75,8 @@ export interface RouteContent {
   changefreq: "weekly" | "monthly" | "yearly";
   priority: string;
   schemaType?: "WebApplication" | "Article" | "HowTo" | "WebPage";
+  /** When true: emit noindex,follow and exclude from sitemap and navigation. Page stays accessible. */
+  noindex?: boolean;
   toolComponent?:
     | "Hosting"          // master hosting checker (SearchBar -> /results)
     | "DnsLookup"
@@ -1199,6 +1201,9 @@ for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
 
 
 
+
+// Guide pages are de-indexed: kept accessible, but excluded from sitemap and navigation.
+for (const g of GUIDE_ROUTES) g.noindex = true;
 
 export const ALL_ROUTES: RouteContent[] = [
 

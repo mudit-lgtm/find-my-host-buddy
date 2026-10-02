@@ -70,11 +70,6 @@ export function SeoHead({ route }: SeoHeadProps) {
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "All",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.8",
-        ratingCount: "1284",
-      },
     }),
 
     ...(route.schemaType === "Article" && {
@@ -121,7 +116,10 @@ export function SeoHead({ route }: SeoHeadProps) {
       <meta name="twitter:title" content={route.title} />
       <meta name="twitter:description" content={route.description} />
       <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
-      <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+      <meta
+        name="robots"
+        content={route.noindex ? "noindex, follow" : "index, follow, max-snippet:-1, max-image-preview:large"}
+      />
       <script type="application/ld+json">{JSON.stringify(primarySchema)}</script>
       <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>
       {webPageSchema && (
