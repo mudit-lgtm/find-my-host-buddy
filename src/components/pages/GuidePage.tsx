@@ -48,6 +48,17 @@ export default function GuidePage({ route }: { route: RouteContent }) {
           </ol>
         </nav>
 
+        {route.path === "/guides/how-to-find-where-a-website-is-hosted" && (
+          <div className="container max-w-3xl mx-auto px-4 pt-6">
+            <a
+              href="/"
+              className="block rounded-xl border border-primary/30 bg-primary/5 p-4 text-center font-display font-semibold text-primary hover:bg-primary/10 transition-colors"
+            >
+              Skip the guide — use the free Host Checker to find any site's host in seconds →
+            </a>
+          </div>
+        )}
+
         <article className="container max-w-3xl mx-auto px-4 py-10">
           <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight">{route.h1}</h1>
           <p className="mt-4 text-lg text-muted-foreground leading-relaxed">{route.intro}</p>

@@ -1,5 +1,5 @@
 import { Globe } from "lucide-react";
-import { TOOL_ROUTES, GUIDE_ROUTES } from "@/lib/seo/keywordMap";
+import { TOOL_ROUTES } from "@/lib/seo/keywordMap";
 
 const toolLinks = [
   { label: "Host Checker", href: "/" },
@@ -11,11 +11,13 @@ const companyLinks = [
   { label: "Contact Us", href: "/contact" },
 ];
 
-// Max 3 resource links — no full guide/blog category dump.
-const resourceLinks = GUIDE_ROUTES.slice(0, 3).map((r) => ({
-  label: r.h1.split(" — ")[0].replace(/\(.*\)/, "").trim(),
-  href: r.path,
-}));
+// Guides are de-indexed and removed from navigation — Resources column
+// now points to authoritative external references instead.
+const resourceLinks = [
+  { label: "ICANN — Domain Registration", href: "https://www.icann.org" },
+  { label: "Cloudflare — What is DNS?", href: "https://www.cloudflare.com/learning/dns/what-is-dns/" },
+  { label: "MDN — HTTP Headers", href: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers" },
+];
 
 const legalLinks = [
   { label: "Privacy Policy", href: "/privacy" },
@@ -34,6 +36,7 @@ function Column({ title, links }: { title: string; links: { label: string; href:
           <li key={l.href}>
             <a
               href={l.href}
+              {...(l.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               className="block text-sm leading-snug text-muted-foreground hover:text-primary transition-colors"
             >
               {l.label}
