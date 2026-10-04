@@ -106,82 +106,39 @@ const SSL_LABS = { label: "SSL Labs — Server Test", href: "https://www.ssllabs
 
 export const HOME_ROUTE: RouteContent = {
   path: "/",
-  title: "Host Checker – Find Where Any Website Is Hosted Free",
-  description: "Instantly check who hosts any website. Free host checker & IP lookup tool — see hosting provider, server location, and DNS info in seconds.",
-  h1: "Host Checker — Check Host & Find Who Is Hosting Any Website",
-  intro: "Free host checker (a.k.a. checkhost / hostchecker / check-host) that finds who hosts any website in seconds. Paste a domain to check host, find the hosting provider, server IP, server location, nameservers, DNS records, and WHOIS data — no signup, unlimited lookups, accurate worldwide.",
+  title: "Check Host: Website Hosting Checker & Provider Lookup",
+  description: "Free website hosting checker. Enter any domain to see its hosting provider, IP address, server location and ASN in seconds. No signup.",
+  h1: "Website Hosting Checker: Find Who Hosts Any Domain",
+  intro: "Enter a domain to check host, provider, IP and server location.",
   keywords: [
     "check host", "host checker", "hostchecker", "checkhost", "check-host",
-    "hosting checker", "find website host", "where is website hosted", "where is it hosted",
-    "who is hosting", "who hosts this site", "hosting lookup", "web hosting lookup",
-    "find my host", "host finder", "web host checker", "ip host checker",
-    "where is my website hosted", "find out who is hosting any website", "cek host",
+    "website hosting checker", "who hosts this website", "where is a website hosted",
+    "host finder", "web host checker", "hosting provider lookup",
   ],
   sections: [
     {
-      heading: "How the host checker works",
-      body: "Enter any domain and we resolve its A and AAAA records, look up the owning ASN of the IP, geolocate the server, and match the result against a database of 500+ hosting providers. Results combine DNS, WHOIS, IP ownership, SSL fingerprint, and HTTP headers so you see the real hosting company even when sites sit behind Cloudflare or another CDN.",
-    },
-    {
-      heading: "What our hosting lookup returns",
-      body: "Hosting provider name, ASN, IPv4 and IPv6 addresses, reverse-DNS hostname, server city and country, nameservers (NS), mail servers (MX), TXT and SPF records, WHOIS registration data, SSL issuer, and HTTP response time. Everything you need from a single web hosting lookup.",
-    },
-    {
-      heading: "Why find website host data matters",
-      body: "Compare providers before switching, research competitor stacks, verify a migration completed cleanly, qualify sales prospects by infrastructure, debug DNS propagation, or simply answer 'where is my website hosted' for sites you manage. Hosting also affects page speed, uptime, and SEO ranking.",
-    },
-    {
-      heading: "Where is this site hosted? Read the result",
-      body: "The provider field is the company physically serving the files. The location field is the data-center city the server lives in. If the result shows Cloudflare, Fastly, or Akamai the site uses a CDN — the true origin is hidden by design but MX and TXT records often hint at the real backend.",
-    },
-  ],
-  tables: [
-    {
-      caption: "Common hosting providers our host checker identifies",
-      headers: ["Provider", "Type", "Typical use case", "Starting price (USD)"],
-      rows: [
-        ["Hostinger", "Shared / Cloud / VPS", "Beginner & SMB sites", "$2.99 / mo"],
-        ["AWS (EC2, Lightsail)", "Cloud", "Scalable apps & SaaS", "Pay-as-you-go"],
-        ["Cloudflare Pages", "Edge / CDN", "Static & Jamstack sites", "Free tier"],
-        ["DigitalOcean", "Cloud VPS", "Developer projects", "$4 / mo"],
-        ["Google Cloud", "Cloud", "Enterprise workloads", "Pay-as-you-go"],
-        ["GoDaddy", "Shared / WordPress", "Small business sites", "$5.99 / mo"],
-        ["Bluehost", "Shared / WordPress", "Beginner WordPress", "$2.95 / mo"],
-        ["Vercel", "Edge / Serverless", "Next.js & frontend apps", "Free tier"],
-      ],
-    },
-    {
-      caption: "What you can learn from a single hosting lookup",
-      headers: ["Field", "Source", "Why it matters"],
-      rows: [
-        ["Hosting provider", "IP → ASN lookup", "Who serves the files"],
-        ["IPv4 / IPv6", "DNS A / AAAA", "The origin server address"],
-        ["Server city / country", "IP geolocation", "Latency & data sovereignty"],
-        ["Nameservers", "DNS NS records", "Who controls DNS"],
-        ["Mail server", "DNS MX records", "Where email is delivered"],
-        ["Registrar", "WHOIS", "Where the domain was bought"],
-        ["SSL issuer", "TLS handshake", "Certificate authority used"],
-      ],
+      heading: "A free website hosting checker that just answers",
+      body: "This free website hosting checker answers one question fast: who hosts this website? Enter any domain and the host finder identifies the server IP, its network owner (ASN), and shows where a website is hosted — provider, city and country — in seconds. The web host checker works for any public domain, with no signup and no limits. Use the hosting provider lookup before a migration, when quoting a client project, or to see which company sits behind a competitor's site. Searches like checkhost, hostchecker or check-host land here — it is the same tool. If a site sits behind Cloudflare or another CDN, we say so clearly and show the hints that point at the real host.",
     },
   ],
   faqs: [
-    { q: "How do I find out who is hosting any website?", a: "Type the domain into the host checker above. We resolve DNS, identify the server IP, look up its owning ASN, and match against 500+ providers — results in under 3 seconds." },
-    { q: "Is this host checker free?", a: "Yes. 100% free, unlimited lookups, no signup, no API key. The web hosting lookup, DNS, and WHOIS data are all included at no cost." },
-    { q: "Where is my website hosted?", a: "Enter your own domain in the bar above. The tool returns your hosting provider, server IP, and the city and country where the server sits." },
-    { q: "Where is this site hosted vs where is the domain registered?", a: "Hosting is where the files live. Registration is which company sold you the domain. They are usually different — our tool surfaces both in one lookup." },
-    { q: "Why does the host checker show Cloudflare?", a: "Cloudflare's proxy terminates all traffic at its edge. The host checker reports Cloudflare because Cloudflare is what answers requests. The origin server is intentionally hidden — try the MX and TXT records for backend hints." },
-    { q: "How accurate is the find-website-host data?", a: "Above 95% for non-CDN sites. CDN-fronted sites resolve to the CDN's edge city, not the origin. We use live DNS plus ASN ownership which is the most accurate non-intrusive method." },
-    { q: "Can I find out who is hosting any website worldwide?", a: "Yes — any public domain on any TLD. Internal or intranet domains are not resolvable on the public internet and will not return results." },
+    { q: "How do I check who hosts a website?", a: "Type the domain into the checker above and press Check Host. We find the server's IP address and network owner, then match them against 500+ known hosting providers — the result appears in seconds." },
+    { q: "Can I find the host of a site behind Cloudflare?", a: "The result shows Cloudflare because its proxy answers all traffic and hides the origin server by design. The full report's mail and verification records often hint at the real hosting company." },
+    { q: "Is this website hosting checker free?", a: "Yes — completely free, with unlimited lookups and no signup or API key required." },
+    { q: "How accurate is the host lookup?", a: "Very accurate for sites not behind a CDN, since we use live resolution and IP ownership data. CDN-fronted sites report the CDN itself, because the origin is intentionally hidden." },
   ],
   related: [
-    { label: "DNS Lookup", href: "/tools/dns-lookup" },
-    { label: "WHOIS Lookup", href: "/tools/whois-lookup" },
-    { label: "IP Checker", href: "/tools/ip-checker" },
-    { label: "Is It Up or Down", href: "/tools/website-down-checker" },
-    { label: "SSL Checker", href: "/tools/ssl-checker" },
-    { label: "Domain Compare", href: "/tools/domain-compare" },
+    { label: "CMS detector", href: "/tools/cms-detector" },
+    { label: "IP host checker", href: "/tools/ip-checker" },
+    { label: "WHOIS domain lookup", href: "/tools/whois-lookup" },
+    { label: "Reverse IP lookup", href: "/tools/reverse-ip-lookup" },
+    { label: "SSL certificate checker", href: "/tools/ssl-checker" },
+    { label: "HTTP header checker", href: "/tools/http-headers" },
+    { label: "DNS lookup", href: "/tools/dns-lookup" },
+    { label: "Port checker", href: "/tools/port-checker" },
+    { label: "Compare two domains", href: "/tools/domain-compare" },
   ],
-  outbound: [ICANN, CLOUDFLARE_HOST, HOSTINGER],
+  outbound: [ICANN, HOSTINGER],
   category: "home",
   changefreq: "weekly",
   priority: "1.0",
@@ -1067,7 +1024,9 @@ export const POLICY_ROUTES: RouteContent[] = [
 ];
 
 // Merge AEO enrichment blocks (key takeaways / common errors / summary) into routes.
+// Homepage is intentionally excluded — it is a pure tool page with no essay blocks.
 for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
+  if (route.path === "/") continue;
   const extras = ROUTE_EXTRAS[route.path];
   if (!extras) continue;
   route.keyTakeaways = extras.keyTakeaways;
@@ -1095,6 +1054,7 @@ function trimToWords(body: string, max: number): string {
 // short blocks — "How it works" and "How to read your results" — keeping total
 // tool-page prose in the 300-500 word range that ranking competitors use.
 for (const route of [HOME_ROUTE, ...TOOL_ROUTES]) {
+  if (route.path === "/") continue; // homepage stays a lean tool page
   const depth = DEPTH_CONTENT[route.path];
   if (!depth) continue;
 
@@ -1149,9 +1109,9 @@ const wordCount = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
 
 const MAX_SECTIONS = 7;
 const MAX_PROSE_WORDS = 1100;
-/** Tool pages cap at 4 FAQs (utility-first structure); homepage keeps 6. */
+/** Tool pages cap at 4 FAQs (utility-first structure); homepage keeps 4. */
 const FAQ_CAP: Record<string, number> = {
-  "/": 6,
+  "/": 4,
 };
 const DEFAULT_FAQ_CAP = 4;
 
