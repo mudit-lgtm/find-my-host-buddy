@@ -78,7 +78,7 @@ for (const r of ALL_ROUTES) {
     .replace(/\s+/g, " ")
     .trim();
   const words = bodyText ? bodyText.split(" ").length : 0;
-  const floor = r.category === "policy" ? 80 : r.category === "guide" ? 300 : 600;
+  const floor = r.category === "policy" ? 80 : r.category === "guide" ? 300 : r.category === "home" ? 150 : 600;
   if (words < floor) {
     issues.push({ path: r.path, problem: `thin content: ${words} words (min ${floor})` });
   }

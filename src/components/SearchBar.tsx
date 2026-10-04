@@ -19,9 +19,12 @@ interface SearchBarProps {
   compact?: boolean;
   /** Optional results view filter — appended as ?view=… so each tool shows only its slice. */
   view?: "dns" | "whois" | "ssl" | "headers" | "ip" | "tech";
+  placeholder?: string;
+  buttonLabel?: string;
+  autoFocus?: boolean;
 }
 
-export function SearchBar({ defaultValue = "", compact = false, view }: SearchBarProps) {
+export function SearchBar({ defaultValue = "", compact = false, view, placeholder, buttonLabel = "Find Host", autoFocus = false }: SearchBarProps) {
   const [query, setQuery] = useState(defaultValue);
   const navigate = useNavigate();
 
@@ -50,7 +53,8 @@ export function SearchBar({ defaultValue = "", compact = false, view }: SearchBa
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder={compact ? "Try another domain…" : "Enter a domain or URL (e.g. example.com)"}
+            placeholder={placeholder ?? (compact ? "Try another domain…" : "Enter a domain or URL (e.g. example.com)")}
+            autoFocus={autoFocus}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className={`${compact ? "h-11 text-sm pl-10" : "h-12 sm:h-14 text-sm sm:text-base pl-11 sm:pl-12"} pr-4 rounded-xl border-2 border-border bg-card shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-colors`}
@@ -61,7 +65,7 @@ export function SearchBar({ defaultValue = "", compact = false, view }: SearchBa
           size="lg"
           className={`${compact ? "h-11 px-5 text-sm" : "h-12 sm:h-14 px-6 sm:px-8 text-sm sm:text-base"} rounded-xl font-display font-semibold shadow-md hover:shadow-lg transition-all w-full sm:w-auto`}
         >
-          Find Host
+          {buttonLabel}
         </Button>
       </form>
 
