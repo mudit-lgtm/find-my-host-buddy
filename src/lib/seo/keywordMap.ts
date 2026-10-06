@@ -109,18 +109,13 @@ export const HOME_ROUTE: RouteContent = {
   title: "Check Host: Website Hosting Checker & Provider Lookup",
   description: "Free website hosting checker. Enter any domain to see its hosting provider, IP address, server location and ASN in seconds. No signup.",
   h1: "Website Hosting Checker: Find Who Hosts Any Domain",
-  intro: "Enter a domain to check host, provider, IP and server location.",
+  intro: "Check a website’s hosting provider from its domain. Results show the public IP address, network owner and server location. Websites behind a CDN may show the CDN instead of the origin host.",
   keywords: [
     "check host", "host checker", "hostchecker", "checkhost", "check-host",
     "website hosting checker", "who hosts this website", "where is a website hosted",
     "host finder", "web host checker", "hosting provider lookup",
   ],
-  sections: [
-    {
-      heading: "A free website hosting checker that just answers",
-      body: "This free website hosting checker answers one question fast: who hosts this website? Enter any domain and the host finder identifies the server IP, its network owner (ASN), and shows where a website is hosted — provider, city and country — in seconds. The web host checker works for any public domain, with no signup and no limits. Use the hosting provider lookup before a migration, when quoting a client project, or to see which company sits behind a competitor's site. Searches like checkhost, hostchecker or check-host land here — it is the same tool. If a site sits behind Cloudflare or another CDN, we say so clearly and show the hints that point at the real host.",
-    },
-  ],
+  sections: [],
   faqs: [
     { q: "How do I check who hosts a website?", a: "Type the domain into the checker above and press Check Host. We find the server's IP address and network owner, then match them against 500+ known hosting providers — the result appears in seconds." },
     { q: "Can I find the host of a site behind Cloudflare?", a: "The result shows Cloudflare because its proxy answers all traffic and hides the origin server by design. The full report's mail and verification records often hint at the real hosting company." },
@@ -138,7 +133,7 @@ export const HOME_ROUTE: RouteContent = {
     { label: "Port checker", href: "/tools/port-checker" },
     { label: "Compare two domains", href: "/tools/domain-compare" },
   ],
-  outbound: [ICANN, HOSTINGER],
+  outbound: [],
   category: "home",
   changefreq: "weekly",
   priority: "1.0",
