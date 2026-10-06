@@ -103,6 +103,16 @@ function renderTable(t: NonNullable<RouteContent["tables"]>[number]): string {
 }
 
 function renderStaticBody(route: RouteContent): string {
+  if (route.path === "/") {
+    const faqs = route.faqs
+      .map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`)
+      .join("");
+    const toolLinks = route.related
+      .map((r) => `<li><a href="${r.href}">${esc(r.label)}</a></li>`)
+      .join("");
+    return `<main><h1>${esc(route.h1)}</h1><form action="/" method="get"><label for="static-domain">Enter a domain or URL</label><input id="static-domain" name="domain" type="text" placeholder="example.com"><button type="submit">Find Host</button></form><section aria-label="What this shows"><h2>What this shows</h2><ul><li>Hosting provider</li><li>Server IP</li><li>Server location</li><li>Network owner</li></ul></section><p id="speakable-intro">${esc(route.intro)}</p><section id="faq"><h2>Host checker FAQ</h2>${faqs}</section><nav aria-label="More free website tools"><h2>More Free Website Tools</h2><ul>${toolLinks}</ul></nav></main>`;
+  }
+
   const sections = route.sections.map((s) => {
     const bullets = s.bullets && s.bullets.length
       ? `<ul>${s.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>`

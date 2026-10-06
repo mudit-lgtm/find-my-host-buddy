@@ -2,9 +2,6 @@ import { SearchBar } from "@/components/SearchBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FAQSection } from "@/components/FAQSection";
-import { HowToSection } from "@/components/HowToSection";
-import { TrustFactors } from "@/components/TrustFactors";
-import { SEOContent } from "@/components/SEOContent";
 import { TOOL_ROUTES, HOME_ROUTE } from "@/lib/seo/keywordMap";
 import {
   Server, Globe, Activity, Wifi, Shield, ArrowRightLeft,
@@ -31,60 +28,43 @@ const Index = () => {
       <Header />
 
       <main className="flex-1">
-        {/* Hero — master Host Checker */}
-        <section className="relative overflow-hidden hero-gradient py-16 md:py-24 lg:py-28">
-          <div className="container max-w-5xl mx-auto px-4 flex flex-col items-center text-center">
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight max-w-3xl leading-[1.1]">
-              Find out who is hosting{" "}
-              <span className="text-gradient">any website</span>
+        <section className="border-b">
+          <div className="container mx-auto flex max-w-5xl flex-col items-center px-4 py-5 text-center sm:py-8">
+            <h1 className="max-w-3xl font-display text-2xl font-bold leading-tight text-foreground sm:text-4xl">
+              {HOME_ROUTE.h1}
             </h1>
-            <p id="speakable-intro" className="mt-4 text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl">
-              Free host checker — paste a domain to instantly find the hosting provider, IP, server location, DNS records &amp; WHOIS.
-            </p>
-
-            <div className="mt-8 w-full flex justify-center">
-              <SearchBar />
+            <div className="mt-4 flex w-full justify-center sm:mt-5">
+              <SearchBar showExtras={false} />
             </div>
-            <a
-              href="/go/hostinger"
-              target="_blank"
-              rel="nofollow sponsored noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-primary/20 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              🚀 Need fast hosting? <span className="font-semibold text-primary">Try Hostinger →</span>
-            </a>
           </div>
         </section>
 
-        <TrustFactors />
+        <section aria-labelledby="what-this-shows" className="container mx-auto max-w-5xl px-4 py-5">
+          <h2 id="what-this-shows" className="mb-3 text-center font-display text-sm font-semibold text-muted-foreground">
+            What this shows
+          </h2>
+          <div className="grid grid-cols-2 border-y sm:grid-cols-4">
+            {["Hosting provider", "Server IP", "Server location", "Network owner"].map((item) => (
+              <div key={item} className="border-b px-3 py-3 text-center text-sm font-medium text-foreground last:border-b-0 even:border-l sm:border-b-0 sm:even:border-l-0 sm:[&:not(:first-child)]:border-l">
+                {item}
+              </div>
+            ))}
+          </div>
+          <p id="speakable-intro" className="mx-auto mt-4 max-w-3xl text-center text-sm leading-relaxed text-muted-foreground">
+            {HOME_ROUTE.intro}
+          </p>
+        </section>
 
-        {/* KEY TAKEAWAYS — AEO answer block */}
-        {HOME_ROUTE.keyTakeaways && (
-          <section id="key-takeaways" className="container max-w-3xl mx-auto px-4 pt-10">
-            <div className="rounded-xl border border-primary/20 bg-primary/[0.04] p-4 sm:p-5">
-              <h2 className="font-display font-bold text-foreground text-base sm:text-lg mb-3">Key takeaways</h2>
-              <ul className="space-y-2 text-sm sm:text-base text-foreground/90">
-                {HOME_ROUTE.keyTakeaways.map((k) => (
-                  <li key={k} className="flex gap-2">
-                    <span aria-hidden className="text-primary font-bold mt-0.5">✓</span>
-                    <span>{k}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        )}
+        <div className="border-t">
+          <FAQSection />
+        </div>
 
-        <HowToSection />
-
-
-        {/* Tools grid — every card links to its own dedicated /tools/* page */}
-        <section className="container max-w-6xl mx-auto px-4 py-14 border-t">
+        <section className="container mx-auto max-w-6xl px-4 py-8 sm:py-10">
           <div className="text-center mb-8">
             <h2 className="font-display text-2xl md:text-3xl font-bold mb-2">
-              <span className="text-gradient">Free Webmaster Tools</span>
+              <span className="text-gradient">More Free Website Tools</span>
             </h2>
-            <p className="text-muted-foreground">Each tool has its own focused page and result view — no signup, instant.</p>
+            <p className="text-muted-foreground">Choose a focused checker for more website details.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {TOOL_ROUTES.map((r) => {
@@ -112,12 +92,6 @@ const Index = () => {
             })}
           </div>
         </section>
-
-        <div className="border-t">
-          <FAQSection />
-        </div>
-
-        <SEOContent />
       </main>
 
       <Footer />

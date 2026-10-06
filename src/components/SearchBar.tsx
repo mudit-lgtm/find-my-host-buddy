@@ -22,9 +22,10 @@ interface SearchBarProps {
   placeholder?: string;
   buttonLabel?: string;
   autoFocus?: boolean;
+  showExtras?: boolean;
 }
 
-export function SearchBar({ defaultValue = "", compact = false, view, placeholder, buttonLabel = "Find Host", autoFocus = false }: SearchBarProps) {
+export function SearchBar({ defaultValue = "", compact = false, view, placeholder, buttonLabel = "Find Host", autoFocus = false, showExtras = true }: SearchBarProps) {
   const [query, setQuery] = useState(defaultValue);
   const navigate = useNavigate();
 
@@ -69,7 +70,7 @@ export function SearchBar({ defaultValue = "", compact = false, view, placeholde
         </Button>
       </form>
 
-      {!compact && (
+      {!compact && showExtras && (
         <>
           {/* Trust signals */}
           <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm text-muted-foreground">

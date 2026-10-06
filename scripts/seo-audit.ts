@@ -42,7 +42,7 @@ for (const r of ALL_ROUTES) {
   if (r.faqs.length > 0 && !/<details\b/i.test(html)) {
     issues.push({ path: r.path, problem: "FAQ <details> not rendered" });
   }
-  if (!/\/go\/hostinger/.test(html)) {
+  if (r.category !== "home" && !/\/go\/hostinger/.test(html)) {
     issues.push({ path: r.path, problem: "missing cloaked affiliate link (/go/hostinger)" });
   }
   const internalLinks = (html.match(/href="\/(tools|guides|privacy|terms|disclaimer|about|contact)(\/[^"#]*)?"/g) || []).length;
@@ -54,7 +54,7 @@ for (const r of ALL_ROUTES) {
   }
 
   // AEO blocks: key takeaways, common errors, summary (tools + home).
-  if (r.category === "tool" || r.category === "home") {
+  if (r.category === "tool") {
     if (!/id="key-takeaways"/.test(html)) issues.push({ path: r.path, problem: "missing key takeaways block" });
     if (!/id="common-errors"/.test(html)) issues.push({ path: r.path, problem: "missing common errors block" });
     if (!/id="summary"/.test(html)) issues.push({ path: r.path, problem: "missing summary block" });
@@ -64,6 +64,13 @@ for (const r of ALL_ROUTES) {
   }
   if (r.faqs.length > 0 && !/id="faq"/.test(html)) {
     issues.push({ path: r.path, problem: "missing #faq anchor" });
+  }
+  if (r.category === "home") {
+    if (r.faqs.length !== 4) issues.push({ path: r.path, problem: `homepage FAQ count is ${r.faqs.length}, expected 4` });
+    if (r.intro.trim().split(/\s+/).length > 120) issues.push({ path: r.path, problem: "homepage utility text exceeds 120 words" });
+    if (!/<form\b/.test(html) || !/id="static-domain"/.test(html)) issues.push({ path: r.path, problem: "missing static host checker form" });
+    if (!/What this shows/.test(html)) issues.push({ path: r.path, problem: "missing homepage results row" });
+    if (!/href="\/tools\//.test(html)) issues.push({ path: r.path, problem: "missing homepage tool links" });
   }
   if (/"@type":"SoftwareApplication"[^}]*areaServed/.test(html.replace(/\s/g, ""))) {
     issues.push({ path: r.path, problem: "areaServed present on SoftwareApplication schema" });
@@ -78,7 +85,7 @@ for (const r of ALL_ROUTES) {
     .replace(/\s+/g, " ")
     .trim();
   const words = bodyText ? bodyText.split(" ").length : 0;
-  const floor = r.category === "policy" ? 80 : r.category === "guide" ? 300 : r.category === "home" ? 150 : 600;
+  const floor = r.category === "policy" ? 80 : r.category === "guide" ? 300 : r.category === "home" ? 0 : 600;
   if (words < floor) {
     issues.push({ path: r.path, problem: `thin content: ${words} words (min ${floor})` });
   }

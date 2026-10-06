@@ -1,0 +1,1 @@
+Keep the homepage's prerendered body generated separately from article and tool-page markup so crawler-visible HTML stays aligned with the utility-focused homepage.
