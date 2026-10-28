@@ -1,11 +1,14 @@
-// Postbuild prerender: for every route in keywordMap, clone dist/index.html into
-// dist/<path>/index.html with title/description/canonical/og/JSON-LD rewritten
-// and full static body (h1, intro, sections, tables, FAQ) injected into #root.
+// Postbuild prerender: renders every route in ALL_ROUTES through the real <App>
+// with react-dom/server (SSR + StaticRouter), then clones dist/index.html into
+// dist/<path>/index.html with per-route head tags and exactly ONE JSON-LD set.
+// The static HTML equals what users see; src/main.tsx hydrates #root on load.
 //
 // Vercel serves the per-route index.html for Googlebot, ChatGPT, Perplexity, etc.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
 import { resolve } from "path";
+import { tmpdir } from "os";
+import { build } from "esbuild";
 import { ALL_ROUTES, BASE_URL, type RouteContent } from "../src/lib/seo/keywordMap.ts";
 
 const DIST = resolve("dist");
@@ -22,186 +25,166 @@ function esc(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function buildSchemas(route: RouteContent, url: string) {
-  const breadcrumb = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
-      ...(route.category !== "home" ? [{ "@type": "ListItem", position: 2, name: route.h1, item: url }] : []),
-    ],
-  };
-  const primary: Record<string, unknown> = {
-    "@context": "https://schema.org",
-    "@type": route.schemaType || "WebPage",
-    name: route.h1,
-    headline: route.h1,
-    description: route.description,
-    url,
-    inLanguage: "en",
-    isAccessibleForFree: true,
-    image: `${BASE_URL}/og-image.png`,
-    speakable: {
-      "@type": "SpeakableSpecification",
-      cssSelector: route.faqs.length ? ["#speakable-intro", "#faq"] : ["#speakable-intro"],
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Site Host Finder",
-      logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` },
-    },
-  };
+// ---------- JSON-LD (single source of truth: this file) ----------
+// Exactly ONE schema set per route:
+//   home          → WebApplication + Organization + WebSite (no SearchAction)
+//   tool pages    → WebApplication + BreadcrumbList (Home > page) + FAQPage (visible FAQs)
+//   guides/policy → WebPage only (no fabricated dates)
+function buildSchemas(route: RouteContent, url: string): string {
+  const blocks: unknown[] = [];
 
-  if (route.schemaType === "WebApplication") {
-    Object.assign(primary, {
+  if (route.category === "home" || route.category === "tool") {
+    blocks.push({
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: route.h1,
+      url,
+      description: route.description,
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "All",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     });
   }
 
-  if (route.schemaType === "Article") {
-    Object.assign(primary, {
-      author: { "@type": "Organization", name: "Site Host Finder" },
-      datePublished: "2026-01-01",
-      dateModified: new Date().toISOString().slice(0, 10),
+  if (route.category === "tool") {
+    blocks.push({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
+        { "@type": "ListItem", position: 2, name: route.h1, item: url },
+      ],
     });
+    // FAQPage only when the same questions are visible on the page (they are:
+    // ToolPage renders route.faqs as <details> elements).
+    if (route.faqs.length) {
+      blocks.push({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: route.faqs.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      });
+    }
   }
-  if (route.schemaType === "HowTo") {
-    Object.assign(primary, {
-      step: route.sections.map((s, i) => ({ "@type": "HowToStep", position: i + 1, name: s.heading, text: s.body })),
-    });
+
+  if (route.category === "home") {
+    blocks.push(
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "Site Host Finder",
+        url: `${BASE_URL}/`,
+        logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` },
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Site Host Finder",
+        url: `${BASE_URL}/`,
+      },
+    );
   }
-  const blocks: unknown[] = [primary, breadcrumb];
-  // Tool pages: also emit WebPage alongside SoftwareApplication for richer indexing.
-  if (route.schemaType === "WebApplication" && route.category === "tool") {
+
+  if (route.category === "guide" || route.category === "policy") {
     blocks.push({
       "@context": "https://schema.org",
       "@type": "WebPage",
-      name: route.title,
+      name: route.h1,
       url,
       description: route.description,
       inLanguage: "en",
-      isPartOf: { "@type": "WebSite", url: `${BASE_URL}/`, name: "Site Host Finder" },
     });
   }
-  if (route.faqs.length) {
-    blocks.push({
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: route.faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-    });
-  }
+
   return blocks.map((b) => `<script type="application/ld+json">${JSON.stringify(b)}</script>`).join("\n    ");
 }
 
-
-function renderTable(t: NonNullable<RouteContent["tables"]>[number]): string {
-  const head = `<thead><tr>${t.headers.map((h) => `<th scope="col">${esc(h)}</th>`).join("")}</tr></thead>`;
-  const body = `<tbody>${t.rows.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody>`;
-  return `<figure><table><caption>${esc(t.caption)}</caption>${head}${body}</table></figure>`;
-}
-
-function renderStaticBody(route: RouteContent): string {
-  if (route.path === "/") {
-    const faqs = route.faqs
-      .map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`)
-      .join("");
-    const toolLinks = route.related
-      .map((r) => `<li><a href="${r.href}">${esc(r.label)}</a></li>`)
-      .join("");
-    return `<main><h1>${esc(route.h1)}</h1><form action="/" method="get"><label for="static-domain">Enter a domain or URL</label><input id="static-domain" name="domain" type="text" placeholder="example.com"><button type="submit">Find Host</button></form><section aria-label="What this shows"><h2>What this shows</h2><ul><li>Hosting provider</li><li>Server IP</li><li>Server location</li><li>Network owner</li></ul></section><p id="speakable-intro">${esc(route.intro)}</p><section id="faq"><h2>Host checker FAQ</h2>${faqs}</section><nav aria-label="More free website tools"><h2>More Free Website Tools</h2><ul>${toolLinks}</ul></nav></main>`;
+// ---------- SSR bundle ----------
+// The app reads import.meta.env (Vite-injected), which is undefined under plain
+// Node — so the SSR entry is bundled with esbuild and the env vars are inlined.
+function loadEnvFile(): Record<string, string> {
+  const env: Record<string, string> = {};
+  try {
+    const raw = readFileSync(resolve(".env"), "utf8");
+    for (const line of raw.split(/\r?\n/)) {
+      const m = line.match(/^\s*([A-Za-z0-9_]+)\s*=\s*(.*?)\s*$/);
+      if (m) env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    }
+  } catch {
+    // No .env — define stays empty; SSR still works for non-API components.
   }
-
-  const sections = route.sections.map((s) => {
-    const bullets = s.bullets && s.bullets.length
-      ? `<ul>${s.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>`
-      : "";
-    return `<section><h2>${esc(s.heading)}</h2><p>${esc(s.body)}</p>${bullets}</section>`;
-  }).join("");
-  const quickAnswer = route.quickAnswer
-    ? `<aside id="quick-answer"><p><strong>Quick answer:</strong> ${esc(route.quickAnswer)}</p></aside>`
-    : "";
-  const geo = route.geoNote ? `<p><em>${esc(route.geoNote)}</em></p>` : "";
-  const takeaways = route.keyTakeaways && route.keyTakeaways.length
-    ? `<section id="key-takeaways"><h2>Key takeaways</h2><ul>${route.keyTakeaways.map((k) => `<li>${esc(k)}</li>`).join("")}</ul></section>`
-    : "";
-  const keyPoints = route.keyPoints && route.keyPoints.length
-    ? `<section aria-label="What this page covers"><h2>What this page covers</h2><ul>${route.keyPoints.map((k) => `<li>${esc(k)}</li>`).join("")}</ul></section>`
-    : "";
-  const useCases = route.useCases && route.useCases.length
-    ? `<section><h2>Real-world use cases</h2>${route.useCases.map((u) => `<article><h3>${esc(u.title)}</h3><p>${esc(u.body)}</p></article>`).join("")}</section>`
-    : "";
-  const trouble = route.troubleshooting && route.troubleshooting.length
-    ? `<section><h2>Troubleshooting</h2><dl>${route.troubleshooting.map((t) => `<dt>${esc(t.problem)}</dt><dd>${esc(t.solution)}</dd>`).join("")}</dl></section>`
-    : "";
-  const errors = route.commonErrors && route.commonErrors.length
-    ? `<section id="common-errors"><h2>Common mistakes and how to fix them</h2><dl>${route.commonErrors.map((e) => `<dt>${esc(e.mistake)}</dt><dd>${esc(e.fix)}</dd>`).join("")}</dl></section>`
-    : "";
-  const summary = route.summary
-    ? `<section id="summary"><h2>Summary</h2><p>${esc(route.summary)}</p></section>`
-    : "";
-  const tables = (route.tables || []).map(renderTable).join("");
-  const faqs = route.faqs.length
-    ? `<section id="faq"><h2>Frequently Asked Questions</h2>${route.faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("")}</section>`
-    : "";
-  const related = route.related.length
-    ? `<nav aria-label="Related"><h2>Related</h2><ul>${route.related.map((r) => `<li><a href="${r.href}">${esc(r.label)}</a></li>`).join("")}</ul></nav>`
-    : "";
-  const outbound = route.outbound.length
-    ? `<nav aria-label="References"><ul>${route.outbound.map((o) => `<li><a href="${o.href}"${o.rel ? ` rel="${o.rel}"` : ""}${o.href.startsWith("http") ? ' target="_blank"' : ""}>${esc(o.label)}</a></li>`).join("")}</ul></nav>`
-    : "";
-  const aff = `<p><a href="/go/hostinger" rel="nofollow sponsored noopener noreferrer">Try Hostinger — fast hosting from $2.99/mo</a></p>`;
-  const hostCheckerCta = route.path === "/guides/how-to-find-where-a-website-is-hosted"
-    ? `<p><a href="/"><strong>Skip the guide — use the free Host Checker tool to find any site's host in seconds →</strong></a></p>`
-    : "";
-  return `<main><h1>${esc(route.h1)}</h1><p id="speakable-intro">${esc(route.intro)}</p>${hostCheckerCta}${quickAnswer}${geo}${takeaways}${keyPoints}${sections}${tables}${useCases}${trouble}${errors}${faqs}${summary}${aff}${related}${outbound}</main>`;
+  return env;
 }
 
+const env = loadEnvFile();
+const SSR_BUNDLE = resolve(tmpdir(), "shf-ssr-bundle.mjs");
+
+await build({
+  entryPoints: [resolve("scripts/ssr-entry.tsx")],
+  outfile: SSR_BUNDLE,
+  bundle: true,
+  platform: "node",
+  format: "esm",
+  jsx: "automatic",
+  alias: { "@": resolve("src") },
+  define: {
+    "import.meta.env": JSON.stringify({ ...env, MODE: "production", DEV: false, PROD: true, SSR: true }),
+    "process.env.NODE_ENV": '"production"',
+  },
+  loader: { ".css": "empty", ".svg": "empty", ".png": "empty", ".jpg": "empty" },
+  logLevel: "warning",
+});
+
+const { renderRoute } = await import(SSR_BUNDLE);
+
+// ---------- Head rewriting ----------
+// Helmet tags from SeoHead replace the template's static SEO tags; JSON-LD is
+// appended once. Non-SEO tags (icons, sitemap link, theme-color, AdSense) stay.
+function stripTemplateSeoTags(html: string): string {
+  return html
+    .replace(/<title>[^<]*<\/title>/i, "")
+    .replace(/<meta name="description"[^>]*>/i, "")
+    .replace(/<link rel="canonical"[^>]*>/i, "")
+    .replace(/<meta property="og:title"[^>]*>/i, "")
+    .replace(/<meta property="og:description"[^>]*>/i, "")
+    .replace(/<meta property="og:url"[^>]*>/i, "")
+    .replace(/<meta property="og:type"[^>]*>/i, "")
+    .replace(/<meta property="og:image"[^>]*>/i, "")
+    .replace(/<meta name="twitter:card"[^>]*>/i, "")
+    .replace(/<meta name="twitter:title"[^>]*>/i, "")
+    .replace(/<meta name="twitter:description"[^>]*>/i, "")
+    .replace(/<meta name="twitter:image"[^>]*>/i, "")
+    .replace(/<meta name="robots"[^>]*>/i, "");
+}
 
 function rewriteForRoute(route: RouteContent): string {
   const url = `${BASE_URL}${route.path === "/" ? "/" : route.path}`;
-  let html = template;
-  html = html.replace(/<title>[^<]*<\/title>/i, `<title>${esc(route.title)}</title>`);
-  html = html.replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${esc(route.description)}" />`);
-  html = html.replace(/<link rel="canonical"[^>]*>/i, `<link rel="canonical" href="${url}" />`);
-  html = html.replace(/<meta property="og:title"[^>]*>/i, `<meta property="og:title" content="${esc(route.title)}" />`);
-  html = html.replace(/<meta property="og:description"[^>]*>/i, `<meta property="og:description" content="${esc(route.description)}" />`);
-  html = html.replace(/<meta property="og:url"[^>]*>/i, `<meta property="og:url" content="${url}" />`);
-  html = html.replace(/<meta name="twitter:title"[^>]*>/i, `<meta name="twitter:title" content="${esc(route.title)}" />`);
-  html = html.replace(/<meta name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${esc(route.description)}" />`);
-
-  if (route.noindex) {
-    html = html.replace(/<meta name="robots"[^>]*>/i, `<meta name="robots" content="noindex, follow" />`);
-  }
-
+  const { body, head } = renderRoute(route.path);
   const schemas = buildSchemas(route, url);
-  html = html.replace(/<\/head>/i, `    ${schemas}\n  </head>`);
 
-  // Inject prerendered body into a HIDDEN sibling div (not #root) so users
-  // never see plain-text content before React mounts, but Googlebot/ChatGPT/
-  // Perplexity still read the full semantic HTML.
-  const staticBody = renderStaticBody(route);
-  const seoBlock = `<div id="seo-prerender" hidden aria-hidden="true">${staticBody}</div>`;
-  html = html.replace(/<div id="root"><\/div>/, `<div id="root"></div>\n    ${seoBlock}`);
+  let html = stripTemplateSeoTags(template);
+  html = html.replace(/<\/head>/i, `    ${head}\n    ${schemas}\n  </head>`);
+  html = html.replace(/<div id="root"><\/div>/, `<div id="root">${body}</div>`);
 
+  if (!html.includes(`<div id="root">${body.slice(0, 40)}`)) {
+    throw new Error(`prerender: SSR body not injected for ${route.path}`);
+  }
   return html;
-}
-
-function proseWords(route: RouteContent): number {
-  const text = [route.intro, ...route.sections.map((s) => `${s.body} ${(s.bullets || []).join(" ")}`)].join(" ");
-  return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
 let written = 0;
 for (const route of ALL_ROUTES) {
-  if (route.path === "/") continue;
-  const outDir = resolve(DIST, route.path.replace(/^\//, ""));
-  mkdirSync(outDir, { recursive: true });
-  const pw = proseWords(route);
-  if (pw > 1100) console.warn(`prerender: WARNING ${route.path} has ${pw} prose words (>1100) — consider trimming`);
-  writeFileSync(resolve(outDir, "index.html"), rewriteForRoute(route), "utf8");
+  const html = rewriteForRoute(route);
+  if (route.path === "/") {
+    writeFileSync(TEMPLATE_PATH, html, "utf8");
+  } else {
+    const outDir = resolve(DIST, route.path.replace(/^\//, ""));
+    mkdirSync(outDir, { recursive: true });
+    writeFileSync(resolve(outDir, "index.html"), html, "utf8");
+  }
   written++;
 }
-writeFileSync(TEMPLATE_PATH, rewriteForRoute(ALL_ROUTES[0]), "utf8");
-console.log(`prerender: wrote ${written + 1} HTML files (1 home + ${written} routes)`);
+console.log(`prerender: SSR-rendered ${written} routes (static HTML = hydrated markup)`);
