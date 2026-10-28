@@ -6,101 +6,10 @@ interface SeoHeadProps {
   route: RouteContent;
 }
 
+// Meta tags only. JSON-LD is emitted once per route by scripts/prerender.ts,
+// so there is exactly one schema source and no duplicate blocks.
 export function SeoHead({ route }: SeoHeadProps) {
   const url = `${BASE_URL}${route.path === "/" ? "/" : route.path}`;
-
-  const breadcrumb = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
-      ...(route.category !== "home"
-        ? [
-            {
-              "@type": "ListItem",
-              position: 2,
-              name:
-                route.category === "tool"
-                  ? "Tools"
-                  : route.category === "guide"
-                    ? "Guides"
-                    : "About",
-              item: `${BASE_URL}/`,
-            },
-            { "@type": "ListItem", position: 3, name: route.h1, item: url },
-          ]
-        : []),
-    ],
-  };
-
-  const faqSchema =
-    route.faqs.length > 0
-      ? {
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: route.faqs.map((f) => ({
-            "@type": "Question",
-            name: f.q,
-            acceptedAnswer: { "@type": "Answer", text: f.a },
-          })),
-        }
-      : null;
-
-  const primarySchema: Record<string, unknown> = {
-    "@context": "https://schema.org",
-    "@type": route.schemaType || "WebPage",
-    name: route.h1,
-    headline: route.h1,
-    description: route.description,
-    url,
-    inLanguage: "en",
-    isAccessibleForFree: true,
-    image: `${BASE_URL}/og-image.png`,
-    speakable: {
-      "@type": "SpeakableSpecification",
-      cssSelector: route.faqs.length > 0 ? ["#speakable-intro", "#faq"] : ["#speakable-intro"],
-    },
-
-    publisher: {
-      "@type": "Organization",
-      name: "Site Host Finder",
-      logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.svg` },
-    },
-    ...(route.schemaType === "WebApplication" && {
-      applicationCategory: "UtilitiesApplication",
-      operatingSystem: "All",
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    }),
-
-    ...(route.schemaType === "Article" && {
-      author: { "@type": "Organization", name: "Site Host Finder" },
-      datePublished: "2026-01-01",
-      dateModified: new Date().toISOString().slice(0, 10),
-    }),
-    ...(route.schemaType === "HowTo" && {
-      step: route.sections.map((s, i) => ({
-        "@type": "HowToStep",
-        position: i + 1,
-        name: s.heading,
-        text: s.body,
-      })),
-    }),
-  };
-
-  // For tool pages, also emit a WebPage schema alongside SoftwareApplication.
-  const webPageSchema =
-    route.schemaType === "WebApplication" && route.category === "tool"
-      ? {
-          "@context": "https://schema.org",
-          "@type": "WebPage",
-          name: route.title,
-          url,
-          description: route.description,
-          inLanguage: "en",
-          isPartOf: { "@type": "WebSite", url: `${BASE_URL}/`, name: "Site Host Finder" },
-          breadcrumb: breadcrumb,
-        }
-      : null;
 
   return (
     <Helmet>
@@ -120,14 +29,6 @@ export function SeoHead({ route }: SeoHeadProps) {
         name="robots"
         content={route.noindex ? "noindex, follow" : "index, follow, max-snippet:-1, max-image-preview:large"}
       />
-      <script type="application/ld+json">{JSON.stringify(primarySchema)}</script>
-      <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>
-      {webPageSchema && (
-        <script type="application/ld+json">{JSON.stringify(webPageSchema)}</script>
-      )}
-      {faqSchema && (
-        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
-      )}
     </Helmet>
   );
 }
